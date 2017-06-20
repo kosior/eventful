@@ -1,0 +1,5 @@
+venv
+.idea
+__pycache__
+eventful/eventful/settings/secrets.json
+eventful/events/migrations
