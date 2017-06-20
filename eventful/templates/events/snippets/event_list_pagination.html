@@ -1,0 +1,10 @@
+{% include 'events/snippets/events_4_in_row.html' %}
+
+{% if page_obj.has_next %}
+    <ul class="pager">
+        <li onclick="paginate(this)" data-pagenum="{{ page_obj.next_page_number }}">
+            <a>Show more events</a>
+        </li>
+    </ul>
+{% endif %}
+

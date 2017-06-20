@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block title %}
+    Explore events.
+{% endblock %}
+
+
+{% block script_head %}
+    <script> var url_events_ajax = "{{ request.path }}"</script>
+    <script src="{% static 'js/events/events_pagination.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="events">
+        {% include 'events/snippets/event_list_pagination.html' %}
+    </div>
+{% endblock %}
