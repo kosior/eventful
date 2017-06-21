@@ -1,7 +1,16 @@
 from django.utils import timezone
-from django.views.generic import ListView
-
+from django.views.generic import ListView, DetailView
 from events.models import Event
+
+
+class EventDetail(DetailView):
+    model = Event
+
+    def get_object(self, **kwargs):
+        event = super(EventDetail, self).get_object(**kwargs)
+        event.views += 1
+        event.save()
+        return event
 
 
 class EventListView(ListView):
