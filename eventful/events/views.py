@@ -1,5 +1,8 @@
+from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView
+
+from events.forms import CreateEventForm
 from events.models import Event
 
 
@@ -11,6 +14,14 @@ class EventDetail(DetailView):
         event.views += 1
         event.save()
         return event
+
+
+class EventCreate(CreateView):
+    form_class = CreateEventForm
+    template_name = 'events/event_create.html'
+
+    def get_success_url(self):
+        return reverse('events:detail', args=(self.object.pk, ))
 
 
 class EventListView(ListView):

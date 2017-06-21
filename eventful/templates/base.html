@@ -18,12 +18,16 @@
 
     {% block script_head %}
     {% endblock %}
+
+    {% block style %}
+    {% endblock %}
 </head>
 <body>
 
 {% url 'events:public' as events_public %}
 {% url 'events:private' as events_private %}
 {% url 'events:friends' as events_friends %}
+{% url 'events:create' as events_create %}
 
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
@@ -48,7 +52,7 @@
                         <li><a href="{{ events_friends }}">Friends</a></li>
                     </ul>
                 </li>
-                <li><a href="#">Create event</a></li>
+                <li {% if request.path == events_create %} class="active" {% endif %}><a href="{{ events_create }}">Create event</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="https://github.com/kosior" target="_blank">GitHub</a></li>
