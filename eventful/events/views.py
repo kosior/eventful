@@ -1,6 +1,6 @@
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import ListView, DetailView, CreateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 
 from events.forms import CreateEventForm
 from events.models import Event
@@ -16,17 +16,25 @@ class EventDetail(DetailView):
         return event
 
 
-class EventCreate(CreateView):
+class EventActionMixin:
     form_class = CreateEventForm
-    template_name = 'events/event_create.html'
+    template_name = 'events/event_create_update.html'
 
     def get_success_url(self):
         return reverse('events:detail', args=(self.object.pk, ))
 
 
+class EventCreate(EventActionMixin, CreateView):
+    model = Event
+
+
 class EventDelete(DeleteView):
     model = Event
     success_url = reverse_lazy('index')
+
+
+class EventUpdate(EventActionMixin, UpdateView):
+    model = Event
 
 
 class EventListView(ListView):

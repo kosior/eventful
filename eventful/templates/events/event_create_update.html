@@ -17,8 +17,8 @@
                 showTodayButton: true,
                 showClear: true,
                 allowInputToggle: true,
-{#                locale: 'pl',#}
-                format: 'YYYY-MM-DD HH:mm ZZ',
+                locale: '{{ LANGUAGE_CODE }}',
+                format: 'DD.MM.YYYY HH:mm ZZ',
                 sideBySide: true,
                 minDate: moment()
             })
@@ -45,23 +45,29 @@
     </div>
 
     <div class="well">
-        <form id="event-form" method="POST" action="{% url 'events:create' %}">
+        <form id="event-form" method="POST" action="{{ request.path }}">
             {% csrf_token %}
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="{{ form.title.id_for_label }}">{{ form.title.label }}:</label>
-                        <input name="{{ form.title.name }}" type="text" class="form-control" id="{{ form.title.id_for_label }}" required maxlength="{{ form.title.field.max_length }}">
+                        <input name="{{ form.title.name }}" type="text" class="form-control"
+                               id="{{ form.title.id_for_label }}" required
+                               maxlength="{{ form.title.field.max_length }}"
+                               value="{{ event.title }}">
                     </div>
                     <div class="form-group">
                         <label for="{{ form.description.id_for_label }}">{{ form.description.label }}:</label>
                         <textarea name="{{ form.description.name }}" style="resize: none" class="form-control" rows="5"
-                                  id="{{ form.description.id_for_label }}" maxlength="{{ form.description.field.max_length }}"></textarea>
+                                  id="{{ form.description.id_for_label }}"
+                                  maxlength="{{ form.description.field.max_length }}">{{ event.description }}</textarea>
                     </div>
                     <div class="form-group">
                         <label for="{{ form.start_date.id_for_label }}">{{ form.start_date.label }}:</label>
                         <div class='input-group date' id='datetimepicker'>
-                            <input name="{{ form.start_date.name }}" type='text' class="form-control" id="{{ form.start_date.id_for_label }}" required/>
+                            <input name="{{ form.start_date.name }}" type='text' class="form-control"
+                                   id="{{ form.start_date.id_for_label }}" required
+                                   value="{{ event.start_date|date:'d.m.Y H:i O' }}"/>
                             <span class="input-group-addon">
                                 <span class="glyphicon glyphicon-calendar"></span>
                             </span>
@@ -71,7 +77,9 @@
                         <label for="{{ form.privacy.id_for_label }}">{{ form.privacy.label }}:</label>
                         <select name="{{ form.privacy.name }}" class="form-control" id="{{ form.privacy.id_for_label }}" required>
                             {% for value, display in form.privacy.field.choices %}
-                                <option value="{{ value }}">{{ display }}</option>
+                                <option value="{{ value }}" {% if event.privacy == value %}selected{% endif %}>
+                                    {{ display }}
+                                </option>
                             {% endfor %}
                         </select>
                     </div>
@@ -81,7 +89,9 @@
                 </div>
             </div>
             <div class="text-center">
-                <input class="btn btn-default" type="submit" name="submit" value="Create event">
+            <div>
+            </div>
+                <input class="btn btn-default" type="submit" name="submit" value="{% if event %}Update event{% else %}Create event{% endif %}">
             </div>
         </form>
     </div>
