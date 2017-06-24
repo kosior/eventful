@@ -8,6 +8,7 @@ from events.views import IndexView
 urlpatterns = [
     url(r'^$', IndexView.as_view(), name='index'),
     url(r'^events/', include('events.urls')),
+    url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', admin.site.urls),
 ]
 

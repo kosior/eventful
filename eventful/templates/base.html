@@ -28,6 +28,9 @@
 {% url 'events:private' as events_private %}
 {% url 'events:friends' as events_friends %}
 {% url 'events:create' as events_create %}
+{% url 'account_signup' as account_signup %}
+{% url 'account_login' as account_login %}
+{% url 'account_logout' as account_logout %}
 
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
@@ -55,7 +58,12 @@
                 <li {% if request.path == events_create %} class="active" {% endif %}><a href="{{ events_create }}">Create event</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="https://github.com/kosior" target="_blank">GitHub</a></li>
+                {% if user.is_authenticated %}
+                    <li {% if request.path == account_logout %} class="active" {% endif %}><a href="{% url 'account_logout' %}"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
+                {% else %}
+                    <li {% if request.path == account_signup %} class="active" {% endif %}><a href="{{ account_signup }}">Register</a></li>
+                    <li {% if request.path == account_login %} class="active" {% endif %}><a href="{{ account_login }}">Login</a></li>
+                {% endif %}
             </ul>
         </div>
     </div>
@@ -66,9 +74,9 @@
         <div class="row">
         {% for message in messages %}
             <div class="col-md-8 col-md-offset-2">
-                <div class="alert alert-{{ message.extra_tags|lower }} alert-dismissable fade in">
+                <div class="alert alert-{{ message.tags|lower }} alert-dismissable fade in">
                     <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                    <strong>{{ message.extra_tags }}!</strong> {{ message }}
+                    <strong>{{ message }}</strong>
                 </div>
             </div>
         {% endfor %}

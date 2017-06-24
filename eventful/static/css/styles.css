@@ -8,3 +8,7 @@ pre {
     background-color: transparent;
     font-family: inherit;
 }
+
+.asteriskField {
+    display: none;
+}

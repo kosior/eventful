@@ -53,9 +53,16 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'crispy_forms',
     'events',
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -123,6 +130,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+LOGIN_REDIRECT_URL = '/'
+
+LOGIN_URL = '/accounts/login/'
+
+ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
@@ -137,7 +154,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-DATETIME_FORMAT = 'd.m.Y H:i'
+DATETIME_FORMAT = 'd.m.Y H:i O'
 
 
 # Static files (CSS, JavaScript, Images)
@@ -146,3 +163,7 @@ DATETIME_FORMAT = 'd.m.Y H:i'
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [STATIC_DIR, ]
+
+# django-crispy-forms
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
