@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 
+{% load l10n %}
+
 {% load staticfiles %}
+
+{% load crispy_forms_tags %}
 
 {% block title %}
     Create event.
@@ -11,6 +15,7 @@
     <script src="{% static 'js/bootstrap-datetimepicker.min.js' %}"></script>
     <script type="text/javascript">
         $(function () {
+            $('#div_id_start_date').find('.input-group:first').addClass('date').attr('id', 'datetimepicker');
             $('#datetimepicker').datetimepicker({
                 toolbarPlacement: 'bottom',
                 showClose: true,
@@ -31,68 +36,24 @@
 {% endblock %}
 
 {% block content %}
-    <div>
-        {% if form.errors %}
-            {% for field in form %}
-                {% for error in field.errors %}
-                    <div class="alert alert-danger alert-dismissable fade in">
-                        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                        <strong>{{ field.label }}: {{ error|escape }}</strong>
-                    </div>
-                {% endfor %}
-            {% endfor %}
-        {% endif %}
-    </div>
-
+    {% localize off %}
     <div class="well">
         <form id="event-form" method="POST" action="{{ request.path }}">
             {% csrf_token %}
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="{{ form.title.id_for_label }}">{{ form.title.label }}:</label>
-                        <input name="{{ form.title.name }}" type="text" class="form-control"
-                               id="{{ form.title.id_for_label }}" required
-                               maxlength="{{ form.title.field.max_length }}"
-                               value="{{ event.title }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="{{ form.description.id_for_label }}">{{ form.description.label }}:</label>
-                        <textarea name="{{ form.description.name }}" style="resize: none" class="form-control" rows="5"
-                                  id="{{ form.description.id_for_label }}"
-                                  maxlength="{{ form.description.field.max_length }}">{{ event.description }}</textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="{{ form.start_date.id_for_label }}">{{ form.start_date.label }}:</label>
-                        <div class='input-group date' id='datetimepicker'>
-                            <input name="{{ form.start_date.name }}" type='text' class="form-control"
-                                   id="{{ form.start_date.id_for_label }}" required
-                                   value="{{ event.start_date|date:'d.m.Y H:i O' }}"/>
-                            <span class="input-group-addon">
-                                <span class="glyphicon glyphicon-calendar"></span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="{{ form.privacy.id_for_label }}">{{ form.privacy.label }}:</label>
-                        <select name="{{ form.privacy.name }}" class="form-control" id="{{ form.privacy.id_for_label }}" required>
-                            {% for value, display in form.privacy.field.choices %}
-                                <option value="{{ value }}" {% if event.privacy == value %}selected{% endif %}>
-                                    {{ display }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                    {% crispy form %}
                     <div class="col-md-6">
                         {# place for location #}
                     </div>
                 </div>
             </div>
             <div class="text-center">
-            <div>
-            </div>
-                <input class="btn btn-default" type="submit" name="submit" value="{% if event %}Update event{% else %}Create event{% endif %}">
+                <button class="btn btn-primary center-block" type="submit" name="submit">
+                    {% if event %}Update event{% else %}Create event{% endif %}
+                </button>
             </div>
         </form>
     </div>
+    {% endlocalize %}
 {% endblock %}

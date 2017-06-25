@@ -3,7 +3,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 
-from events.forms import CreateEventForm
+from events.forms import EventForm
 from events.models import Event
 
 
@@ -18,7 +18,7 @@ class EventDetail(DetailView):
 
 
 class EventActionMixin:
-    form_class = CreateEventForm
+    form_class = EventForm
     template_name = 'events/event_create_update.html'
 
     @property
