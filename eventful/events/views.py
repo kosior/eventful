@@ -1,10 +1,14 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 
+from events.decorators import user_is_event_author
 from events.forms import EventForm
 from events.models import Event
+from events.utils import is_user_an_author
 
 
 class EventDetail(DetailView):
@@ -16,6 +20,11 @@ class EventDetail(DetailView):
         event.save()
         return event
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_author'] = is_user_an_author(self.request, kwargs['object'])
+        return context
+
 
 class EventActionMixin:
     form_class = EventForm
@@ -26,6 +35,7 @@ class EventActionMixin:
         return NotImplemented
 
     def form_valid(self, form):
+        form.instance.created_by = self.request.user
         messages.success(self.request, self.success_msg, extra_tags='Success')
         return super().form_valid(form)
 
@@ -33,16 +43,19 @@ class EventActionMixin:
         return reverse('events:detail', args=(self.object.pk, ))
 
 
+@method_decorator(login_required, name='dispatch')
 class EventCreate(EventActionMixin, CreateView):
     model = Event
     success_msg = 'Event created.'
 
 
+@method_decorator(user_is_event_author, name='dispatch')
 class EventUpdate(EventActionMixin, UpdateView):
     model = Event
     success_msg = 'Event updated.'
 
 
+@method_decorator(user_is_event_author, name='dispatch')
 class EventDelete(DeleteView):
     model = Event
     success_url = reverse_lazy('index')
@@ -72,9 +85,11 @@ class EventsPaginate(EventListView):
         return 'events/events.html'
 
 
+@method_decorator(login_required, name='dispatch')
 class EventsPrivate(EventsPaginate):
     privacy = Event.PRIVATE
 
 
+@method_decorator(login_required, name='dispatch')
 class EventsFriends(EventsPaginate):
     privacy = Event.FRIENDS

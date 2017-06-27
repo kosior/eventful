@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -12,6 +13,7 @@ class Event(models.Model):
         (FRIENDS, 'Friends only')
     )
 
+    created_by = models.ForeignKey(User, related_name='created_events', on_delete=models.CASCADE)
     title = models.CharField(max_length=128)
     description = models.TextField(max_length=500, blank=True)
     start_date = models.DateTimeField()

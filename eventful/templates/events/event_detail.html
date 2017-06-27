@@ -15,7 +15,7 @@
                 </div>
                 <div class="panel-footer text-center">
                     <small class="text-muted">Organizer:</small>
-                    <a href="#">Author</a>
+                    <a href="#">{{ event.created_by.username }}</a>
                     <br>
                     <small class="text-muted">Views: {{ event.views }}</small>
                 </div>
@@ -23,6 +23,7 @@
         </div>
     </div>
 
+    {% if is_author %}
     <div class="text-center">
         <a href="{% url 'events:update' event.pk %}" class="btn btn-default">Update</a>
         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modalDelete">Delete</button>
@@ -47,4 +48,5 @@
             </div>
         </div>
     </div>
+    {% endif %}
 {% endblock %}
