@@ -8,7 +8,6 @@ from django.views.generic import ListView, DetailView, CreateView, DeleteView, U
 from events.decorators import user_is_event_author
 from events.forms import EventForm
 from events.models import Event
-from events.utils import is_user_an_author
 
 
 class EventDetail(DetailView):
@@ -19,11 +18,6 @@ class EventDetail(DetailView):
         event.views += 1
         event.save()
         return event
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['is_author'] = is_user_an_author(self.request, kwargs['object'])
-        return context
 
 
 class EventActionMixin:
