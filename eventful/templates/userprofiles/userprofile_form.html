@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Update profile
+{% endblock %}
+
+{% block content %}
+
+        <form id="userprofile-form" method="POST" action="{{ request.path }}">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <div class="well">
+                        {{ form|crispy }}
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <button class="btn btn-primary center-block" type="submit" name="submit">
+                    Update profile
+                </button>
+            </div>
+        </form>
+{% endblock %}

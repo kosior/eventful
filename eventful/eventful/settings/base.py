@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'crispy_forms',
     'events',
+    'userprofiles',
 ]
 
 SITE_ID = 1

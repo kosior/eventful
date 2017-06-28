@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ requested_user.username }}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading text-center">
+                    <span class="glyphicon glyphicon-user"></span>
+                    <div class="text-nowrap dots">{{ requested_user.username }}</div>
+                    <br>
+                    <div>
+                        {% if user == requested_user %}
+                            <a href="{% url 'userprofiles:update' requested_user.username %}" class="btn btn-default btn-sm btn-block">Update profile</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 1px;">
+                    <br>
+                    <div class="row">
+                        <div class="col-xs-3 text-right"><strong>First name:</strong></div>
+                        <div class="col-xs-9 text-nowrap dots">{{ requested_user.first_name }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-3 text-right"><strong>Last name:</strong></div>
+                        <div class="col-xs-9 text-nowrap dots">{{ requested_user.last_name }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-3 text-right"><strong>Email:</strong></div>
+                        <div class="col-xs-9 text-nowrap dots">{{ requested_user.email }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-3 text-right"><strong>Website:</strong></div>
+                        <div class="col-xs-9 text-nowrap dots"><a href="{{ requested_user.profile.website }}">{{ requested_user.profile.website }}</a></div>
+                    </div>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -27,7 +27,7 @@
                     </div>
                 </div>
                 <div class="panel-footer" style="padding-top: 0; padding-bottom: 0">
-                    <small>Organizer: {{ event.created_by.username }}</small>
+                    <small>Organizer: <a href="{% url 'userprofiles:profile' event.created_by.username %}">{{ event.created_by.username }}</a></small>
                 </div>
             </div>
         </div>
