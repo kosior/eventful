@@ -31,6 +31,7 @@
 {% url 'account_signup' as account_signup %}
 {% url 'account_login' as account_login %}
 {% url 'account_logout' as account_logout %}
+{% url 'userprofiles:profile' user.username as user_profile %}
 
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
@@ -59,7 +60,8 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
-                    <li {% if request.path == account_logout %} class="active" {% endif %}><a href="{% url 'account_logout' %}"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
+                    <li {% if request.path == user_profile %} class="active" {% endif %}><a href="{{ user_profile }}">Profile</a></li>
+                    <li {% if request.path == account_logout %} class="active" {% endif %}><a href="{{ account_logout }}"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
                 {% else %}
                     <li {% if request.path == account_signup %} class="active" {% endif %}><a href="{{ account_signup }}">Register</a></li>
                     <li {% if request.path == account_login %} class="active" {% endif %}><a href="{{ account_login }}">Login</a></li>

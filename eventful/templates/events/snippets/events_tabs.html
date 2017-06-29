@@ -1,0 +1,22 @@
+<ul class="nav nav-pills nav-justified">
+    <li class="active"><a data-toggle="pill" href="#PB">Public events</a></li>
+    <li><a data-toggle="pill" href="#PR">Private events</a></li>
+    <li><a data-toggle="pill" href="#FR">Friends only events</a></li>
+</ul>
+<br>
+{% include 'events/snippets/time_frame_btns.html' %}
+<br>
+
+<div class="tab-content">
+    <div id="PB" class="tab-pane fade in active">
+        {% include 'events/snippets/events_list_group.html' with events=events_pb %}
+    </div>
+
+    <div id="PR" class="tab-pane fade">
+        {% include 'events/snippets/events_list_group.html' with events=events_pr %}
+    </div>
+
+    <div id="FR" class="tab-pane fade">
+        {% include 'events/snippets/events_list_group.html' with events=events_fr %}
+    </div>
+</div>

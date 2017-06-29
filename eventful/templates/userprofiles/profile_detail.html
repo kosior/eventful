@@ -1,7 +1,13 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
 {% block title %}
     {{ requested_user.username }}
+{% endblock %}
+
+{% block script_head %}
+    <script src="{% static 'js/events/hide_show_event.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -39,6 +45,18 @@
                     <br>
                 </div>
             </div>
+        </div>
+        <div class="col-md-8">
+            {% if user == requested_user %}
+                {% include 'events/snippets/events_tabs.html' %}
+            {% else %}
+                <div class="panel panel-primary">
+                    <div class="panel-heading text-center">Public events</div>
+                </div>
+                {% include 'events/snippets/time_frame_btns.html' %}
+                <br>
+                {% include 'events/snippets/events_list_group.html' %}
+            {% endif %}
         </div>
     </div>
 {% endblock %}

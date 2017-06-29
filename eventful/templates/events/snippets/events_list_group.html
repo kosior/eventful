@@ -1,0 +1,27 @@
+<div class="list-group" style="position: relative;">
+    {% if events %}
+        <div class="underInfo">No events available.</div>
+        {% for event in events %}
+            <div class="event {% if datetime_now < event.start_date %}future{% else %}past hideEvent{% endif %}">
+            <a href="{% url 'events:detail' event.pk %}" class="list-group-item">
+                <div class="row">
+                    <div class="col-md-3">
+                        {{ event.start_date }}
+                    </div>
+                    <div class="col-md-4 text-nowrap dots">
+                        {{ event.title }}
+                    </div>
+                    <div class="col-md-4 text-nowrap dots">
+                        {{ event.description }}
+                    </div>
+                    <div class="col-md-1 text-nowrap dots">
+                        <span class="label label-info">{{ event.views }}</span>
+                    </div>
+                </div>
+            </a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center">No events available.</div>
+    {% endif %}
+</div>
