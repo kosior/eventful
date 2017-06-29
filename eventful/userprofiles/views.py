@@ -41,7 +41,7 @@ class ProfileUpdate(UpdateView):
     slug_url_kwarg = 'username'
 
     def get_object(self, queryset=None):
-        return User.objects.get(username=self.kwargs.get('username')).profile
+        return self.request.user.profile
 
     def get_success_url(self):
         return reverse('userprofiles:profile', args=(self.kwargs.get('username'), ))

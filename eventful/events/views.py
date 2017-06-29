@@ -65,7 +65,8 @@ class EventListView(ListView):
     privacy = Event.PUBLIC
 
     def get_queryset(self):
-        return Event.objects.filter(privacy=self.privacy, start_date__gt=timezone.now())
+        events = Event.objects.select_related('created_by')
+        return events.filter(privacy=self.privacy, start_date__gt=timezone.now())
 
 
 class IndexView(EventListView):
