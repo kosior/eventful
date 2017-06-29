@@ -21,6 +21,7 @@
                     <div>
                         {% if user == requested_user %}
                             <a href="{% url 'userprofiles:update' requested_user.username %}" class="btn btn-default btn-sm btn-block">Update profile</a>
+                            <a href="{% url 'account_change_password' %}" class="btn btn-default btn-sm btn-block">Change password</a>
                         {% endif %}
                     </div>
                 </div>
