@@ -6,6 +6,10 @@
 
 {% block title %}{% trans "Signup" %}{% endblock %}
 
+{% block script_head %}
+    {% include 'userprofiles/snippets/timezone_picker_js.html' %}
+{% endblock %}
+
 {% block content %}
     <div class="row" id="form">
         <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-6 col-xs-offset-3">
@@ -18,6 +22,7 @@
                     {% if redirect_field_value %}
                         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
                     {% endif %}
+                    <div id="tz-picker"></div>
                     <button class="primaryAction btn btn-primary center-block btn-block" type="submit">{% trans "Sign Up" %} &raquo;</button>
                 </form>
             </div>

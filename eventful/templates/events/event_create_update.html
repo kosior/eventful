@@ -12,9 +12,11 @@
 
 {% block script_head %}
     <script src="{% static 'js/moment-with-locales.js' %}"></script>
+    <script src="{% static 'js/moment-timezone-with-data.js' %}"></script>
     <script src="{% static 'js/bootstrap-datetimepicker.min.js' %}"></script>
     <script type="text/javascript">
         $(function () {
+            moment.tz.setDefault('{{ request.COOKIES.timezone }}');
             $('#div_id_start_date').find('.input-group:first').addClass('date').attr('id', 'datetimepicker');
             $('#datetimepicker').datetimepicker({
                 toolbarPlacement: 'bottom',

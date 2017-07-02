@@ -1,5 +1,15 @@
 <!DOCTYPE html>
 {% load staticfiles %}
+
+{% url 'events:public' as events_public %}
+{% url 'events:private' as events_private %}
+{% url 'events:friends' as events_friends %}
+{% url 'events:create' as events_create %}
+{% url 'account_signup' as account_signup %}
+{% url 'account_login' as account_login %}
+{% url 'account_logout' as account_logout %}
+{% url 'userprofiles:profile' user.username as user_profile %}
+
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -16,6 +26,10 @@
     <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 
+    {% if not 'timezone' in request.COOKIES and request.path != account_signup and request.path != account_login %}
+        {% include 'userprofiles/snippets/timezone_picker_js.html' %}
+    {% endif %}
+
     {% block script_head %}
     {% endblock %}
 
@@ -23,15 +37,6 @@
     {% endblock %}
 </head>
 <body>
-
-{% url 'events:public' as events_public %}
-{% url 'events:private' as events_private %}
-{% url 'events:friends' as events_friends %}
-{% url 'events:create' as events_create %}
-{% url 'account_signup' as account_signup %}
-{% url 'account_login' as account_login %}
-{% url 'account_logout' as account_logout %}
-{% url 'userprofiles:profile' user.username as user_profile %}
 
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
@@ -59,6 +64,14 @@
                 <li {% if request.path == events_create %} class="active" {% endif %}><a href="{{ events_create }}">Create event</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
+                <li style="margin-right: 5px;">
+                    <div class="btn-nav" title="Timezone">
+                        <a href="{% url 'set_timezone' %}" class="btn btn-primary btn-sm navbar-btn">
+                            <span class="glyphicon glyphicon glyphicon-globe" aria-hidden="true">
+                            </span> &nbsp;{{ TIME_ZONE }}
+                        </a>
+                    </div>
+                </li>
                 {% if user.is_authenticated %}
                     <li {% if request.path == user_profile %} class="active" {% endif %}><a href="{{ user_profile }}">Profile</a></li>
                     <li {% if request.path == account_logout %} class="active" {% endif %}><a href="{{ account_logout }}"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
@@ -85,8 +98,12 @@
         </div>
     {% endif %}
 
-    {% block content %}
-    {% endblock %}
+    {% if not 'timezone' in request.COOKIES and request.path != account_signup and request.path != account_login %}
+        {% include 'userprofiles/snippets/timezone_picker_row.html' with base_template=True redirect_to=request.path %}
+    {% else %}
+        {% block content %}
+        {% endblock %}
+    {% endif %}
 </div>
 </body>
 </html>

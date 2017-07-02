@@ -1,0 +1,18 @@
+{% load staticfiles %}
+
+<script src="{% static 'js/moment-with-locales.js' %}"></script>
+<script src="{% static 'js/moment-timezone-with-data.js' %}"></script>
+
+<script>
+    var resultTz;
+    var tz_abbr = moment.tz.guess();
+    var offset = moment().tz(tz_abbr).format('Z');
+    var url = '{% url 'set_timezone' %}' + '?timezone=' + tz_abbr;
+    $.get(url, function (result) {
+        resultTz = result;
+        $(function () {
+            $('#tz-guess').html(tz_abbr + ' (' + offset + ')');
+            $('#tz-picker').html(resultTz);
+        });
+    });
+</script>

@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Set timezone
+{% endblock %}
+
+{% block content %}
+    {% url 'index' as redirect_to %}
+    {% include 'userprofiles/snippets/timezone_picker_row.html' %}
+{% endblock %}

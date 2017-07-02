@@ -25,3 +25,9 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ('first_name', 'last_name', 'email', 'website')
+
+
+class SignupForm(forms.Form):
+    def signup(self, request, user):
+        user.save()
+        UserProfile(user=user, timezone=request.POST.get('timezone')).save()

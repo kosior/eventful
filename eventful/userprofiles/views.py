@@ -1,12 +1,15 @@
+from django.contrib import messages
 from django.contrib.auth.models import User
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, UpdateView
+from django.views.generic import DetailView, UpdateView, TemplateView
 
 from userprofiles.decorators import user_is_himself
 from userprofiles.forms import UserProfileForm
 from userprofiles.models import UserProfile
+from userprofiles.utils import get_timezones
 
 
 class ProfileDetail(DetailView):
@@ -45,3 +48,34 @@ class ProfileUpdate(UpdateView):
 
     def get_success_url(self):
         return reverse('userprofiles:profile', args=(self.kwargs.get('username'), ))
+
+
+class SetTimezone(TemplateView):
+    def get_template_names(self):
+        if self.request.is_ajax():
+            return 'userprofiles/snippets/timezone_picker_select_form.html'
+        return 'userprofiles/set_timezone.html'
+
+    def get(self, request, *args, **kwargs):
+        tz = request.GET.get('timezone')
+        context = self.get_context_data(tz)
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        tz = request.POST.get('timezone')
+        if request.user.is_authenticated:
+            user_profile = request.user.profile
+            user_profile.timezone = tz
+            user_profile.save()
+        redirect_to = request.POST.get('redirect_to')
+        response = redirect(redirect_to)
+        response.set_cookie('timezone', tz)
+        messages.success(request, 'Timezone set to: {}'.format(tz))
+        return response
+
+    def get_context_data(self, tz, **kwargs):
+        context = super().get_context_data(**kwargs)
+        timezones_suggested, timezones_other = get_timezones(tz)
+        context.update({'timezones_suggested': timezones_suggested,
+                        'timezones_other': timezones_other})
+        return context

@@ -74,6 +74,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'middleware.timezone.TimezoneMiddleware'
 ]
 
 ROOT_URLCONF = 'eventful.urls'
@@ -89,7 +90,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.i18n'
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.tz',
             ],
         },
     },
@@ -141,6 +143,8 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
 
 ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
+
+ACCOUNT_SIGNUP_FORM_CLASS = 'userprofiles.forms.SignupForm'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
