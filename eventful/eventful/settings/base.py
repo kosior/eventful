@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'events',
     'userprofiles',
+    'invitations',
 ]
 
 SITE_ID = 1
