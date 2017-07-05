@@ -2,7 +2,6 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, UpdateView, TemplateView
 
@@ -10,6 +9,8 @@ from userprofiles.decorators import user_is_himself
 from userprofiles.forms import UserProfileForm
 from userprofiles.models import UserProfile
 from userprofiles.utils import get_timezones
+
+from invitations.models import FriendInvitation
 
 
 class ProfileDetail(DetailView):
@@ -19,10 +20,13 @@ class ProfileDetail(DetailView):
     slug_url_kwarg = 'username'
     template_name = 'userprofiles/profile_detail.html'
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.select_related('profile')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['datetime_now'] = timezone.now()
-        events = self.object.created_events.filter()
+        events = self.object.created_events.all()
 
         if self.request.user == self.object:
             event_groups = {'PB': [], 'PR': [], 'FR': []}
@@ -33,6 +37,8 @@ class ProfileDetail(DetailView):
             context['events_fr'] = event_groups['FR']
         else:
             context['events'] = events.filter(privacy='PB')
+            context['invite_status'] = FriendInvitation.objects.get_invite_status(from_user=self.request.user,
+                                                                                  to_user=self.object)
         return context
 
 
