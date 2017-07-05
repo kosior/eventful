@@ -8,6 +8,20 @@
 
 {% block script_head %}
     <script src="{% static 'js/events/hide_show_event.js' %}"></script>
+    <script>
+        function SendFriendRequest(ref) {
+            var data = {'to_user_pk': '{{ requested_user.pk }}', 'csrfmiddlewaretoken': '{{ csrf_token }}'};
+            var url = '{% url 'invitations:send_friend_request' %}';
+            $.post(url, data, function(json){
+                if (json.created){
+                    $(ref).html('Invite sent').addClass('btn-success disabled');
+                }
+                else {
+                    $(ref).html('Error').addClass('btn-danger disabled');
+                }
+            }, 'json');
+        }
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -22,6 +36,18 @@
                         {% if user == requested_user %}
                             <a href="{% url 'userprofiles:update' requested_user.username %}" class="btn btn-default btn-sm btn-block">Update profile</a>
                             <a href="{% url 'account_change_password' %}" class="btn btn-default btn-sm btn-block">Change password</a>
+                        {% elif user.is_authenticated %}
+                            {% if invite_status %}
+                                {% if invite_status == 'A' %}
+                                    <button class="btn btn-success btn-sm btn-block">Friends</button>
+                                {% elif invite_status == 'P' %}
+                                    <button class="btn btn-info btn-sm btn-block" disabled>Friend request has been sent</button>
+                                {% elif invite_status == 'D' %}
+                                    <button class="btn btn-info btn-sm btn-block">{{ requested_user.username }} has sent invitation to you</button>
+                                {% endif %}
+                            {% else %}
+                                <button onclick="SendFriendRequest(this)" class="btn btn-primary btn-sm btn-block">Send friend request</button>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
