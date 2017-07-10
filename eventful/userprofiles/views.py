@@ -73,6 +73,7 @@ class SetTimezone(TemplateView):
             user_profile = request.user.profile
             user_profile.timezone = tz
             user_profile.save()
+            request.session['timezone'] = tz
         redirect_to = request.POST.get('redirect_to')
         response = redirect(redirect_to)
         response.set_cookie('timezone', tz)
