@@ -12,6 +12,7 @@ from events.models import Event
 
 class EventDetail(DetailView):
     model = Event
+    queryset = Event.objects.select_related('created_by')
 
     def get_object(self, **kwargs):
         event = super().get_object(**kwargs)
