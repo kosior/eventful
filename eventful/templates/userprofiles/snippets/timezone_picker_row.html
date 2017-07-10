@@ -16,7 +16,7 @@
                 </div>
                 <input class="hidden" title="reload" name="redirect_to" value="{{ redirect_to }}">
                 <button class="btn btn-primary center-block" type="submit" name="submit" style="width: 150px;">
-                    <strong>Set timezone</strong></button>
+                    <strong>{% if request.user.is_authenticated %}Change timezone{% else %}Set timezone{% endif %}</strong></button>
             </form>
         </div>
     </div>
