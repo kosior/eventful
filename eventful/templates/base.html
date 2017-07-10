@@ -9,6 +9,8 @@
 {% url 'account_login' as account_login %}
 {% url 'account_logout' as account_logout %}
 {% url 'userprofiles:profile' user.username as user_profile %}
+{% url 'invitations:list' as invitations %}
+{% url 'invitations:friends' as friends_list %}
 
 <html lang="en">
 <head>
@@ -62,6 +64,8 @@
                     </ul>
                 </li>
                 <li {% if request.path == events_create %} class="active" {% endif %}><a href="{{ events_create }}">Create event</a></li>
+                <li {% if request.path == invitations %} class="active" {% endif %}><a href="{{ invitations }}">Invitations</a></li>
+                <li {% if request.path == friends_list %} class="active" {% endif %}><a href="{{ friends_list }}">Friends</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li style="margin-right: 5px;">

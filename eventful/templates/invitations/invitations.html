@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block title %}Invitations{% endblock %}
+
+{% block script_head %}
+    <script>var csrf_token = '{{ csrf_token }}'</script>
+    <script src="{% static 'js/invitation.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-4">
+            <div class="well text-center"><strong>Friend invitations</strong></div>
+            {% if friend_invitations %}
+                {% for f_invite in friend_invitations %}
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="row vcenter">
+                                <div class="col-md-6 nowrap dots">
+                                    <a href="{% url 'userprofiles:profile' f_invite.from_user.username %}">
+                                        <strong>{{ f_invite.from_user.username }}</strong>
+                                    </a>
+                                </div>
+                                <div class="col-md-3">
+                                    <button data-pk="{{ f_invite.from_user.pk }}"
+                                            data-url="{% url 'invitations:accept_friend_request' %}"
+                                            data-change="Accepted"
+                                            class="actionRequestBtn btn btn-primary btn-sm btn-block">Accept
+                                    </button>
+                                </div>
+                                <div class="col-md-3">
+                                    <button data-pk="{{ f_invite.from_user.pk }}"
+                                            data-url="{% url 'invitations:reject_friend_request' %}"
+                                            data-change="Rejected"
+                                            class="actionRequestBtn btn btn-danger btn-sm btn-block">Reject
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center">No invitations received</div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-2"></div>
+        <div class="col-md-4">
+            <div class="well text-center"><strong>Event invitations</strong></div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+{% endblock %}
