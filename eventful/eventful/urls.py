@@ -11,7 +11,6 @@ urlpatterns = [
     url(r'^events/', include('events.urls')),
     url(r'^accounts/', include('allauth.urls')),
     url(r'^profile/(?P<username>[\w@.+-]{1,150})/', include('userprofiles.urls')),
-    url(r'^invitations/', include('invitations.urls')),
     url(r'^admin/', admin.site.urls),
 ]
 

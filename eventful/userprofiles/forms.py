@@ -1,6 +1,6 @@
 from django import forms
 
-from userprofiles.models import UserProfile
+from .models import UserProfile
 
 
 class UserProfileForm(forms.ModelForm):
@@ -29,5 +29,5 @@ class UserProfileForm(forms.ModelForm):
 
 class SignupForm(forms.Form):
     def signup(self, request, user):
+        user.profile.timezone = request.POST.get('timezone')
         user.save()
-        UserProfile(user=user, timezone=request.POST.get('timezone')).save()

@@ -22,20 +22,51 @@
                     <br>
                     <div>
                         {% if user == requested_user %}
-                            <a href="{% url 'userprofiles:update' requested_user.username %}" class="btn btn-default btn-sm btn-block">Update profile</a>
-                            <a href="{% url 'account_change_password' %}" class="btn btn-default btn-sm btn-block">Change password</a>
+                            <a href="{% url 'userprofiles:update' requested_user.username %}"
+                               class="btn btn-default btn-sm btn-block">Update profile</a>
+                            <a href="{% url 'account_change_password' %}"
+                               class="btn btn-default btn-sm btn-block">Change password</a>
                         {% elif user.is_authenticated %}
-                            {% if invite_status %}
-                                {% if invite_status == 'A' %}
-                                    <button id="removeFriendBtn" data-pk="{{ requested_user.pk }}" data-url="{% url 'invitations:reject_friend_request' %}" data-change="Removed" class="btn btn-success btn-sm btn-block">Friends <span class="glyphicon glyphicon-ok"></span></button>
-                                {% elif invite_status == 'P' %}
-                                    <button class="btn btn-info btn-sm btn-block" disabled>Friend request has been sent</button>
-                                {% elif invite_status == 'D' %}
-                                    <button class="btn btn-info btn-sm btn-block">{{ requested_user.username }} has sent invitation to you</button>
-                                {% endif %}
+                            {% if are_friends %}
+                                <button id="removeFriendBtn"
+                                        data-pk="{{ requested_user.pk }}"
+                                        data-url="{% url 'userprofiles:remove_friend' requested_user.username %}"
+                                        data-change="Removed"
+                                        class="btn btn-success btn-sm btn-block">
+                                    Friends <span class="glyphicon glyphicon-ok"></span>
+                                </button>
                             {% else %}
-                                <button data-pk="{{ requested_user.pk }}" data-url="{% url 'invitations:send_friend_request' %}" data-change="Invite sent" class="actionRequestBtn btn btn-primary btn-sm btn-block">Send friend request</button>
+                                {% if friend_request %}
+                                    {% if friend_request.to_user_id == requested_user.id %}
+                                        <button class="btn btn-info btn-sm btn-block" disabled>
+                                            Friend request has been sent
+                                        </button>
+                                    {% elif friend_request.from_user_id == requested_user.id %}
+                                        <button data-pk="{{ requested_user.pk }}"
+                                                data-url="{% url 'userprofiles:accept_friend_request' requested_user.username %}"
+                                                data-change="Friend request accepted"
+                                                class="actionRequestBtn btn btn-primary btn-sm btn-block">
+                                            Accept friend request
+                                            from {{ requested_user.username }}
+                                        </button>
+                                        <button data-pk="{{ requested_user.pk }}"
+                                                data-url="{% url 'userprofiles:reject_friend_request' requested_user.username %}"
+                                                data-change="Friend request rejected"
+                                                class="actionRequestBtn btn btn-danger btn-sm btn-block">
+                                            Reject friend request
+                                            from {{ requested_user.username }}
+                                        </button>
+                                    {% endif %}
+                                {% else %}
+                                    <button data-pk="{{ requested_user.pk }}"
+                                            data-url="{% url 'userprofiles:send_friend_request' requested_user.username %}"
+                                            data-change="Invite sent"
+                                            class="actionRequestBtn btn btn-primary btn-sm btn-block">
+                                        Send friend request
+                                    </button>
+                                {% endif %}
                             {% endif %}
+
                         {% endif %}
                     </div>
                 </div>
@@ -55,7 +86,9 @@
                     </div>
                     <div class="row">
                         <div class="col-xs-3 text-right"><strong>Website:</strong></div>
-                        <div class="col-xs-9 text-nowrap dots"><a href="{{ requested_user.profile.website }}">{{ requested_user.profile.website }}</a></div>
+                        <div class="col-xs-9 text-nowrap dots">
+                            <a href="{{ requested_user.profile.website }}">{{ requested_user.profile.website }}</a>
+                        </div>
                     </div>
                     <br>
                 </div>
