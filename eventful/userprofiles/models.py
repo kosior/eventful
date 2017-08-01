@@ -16,6 +16,9 @@ class UserProfile(models.Model):
     def are_friends(self, pk):
         return any(friend.pk == pk for friend in self.friends.all())
 
+    def are_friends_by_filter(self, pk):
+        return self.friends.filter(pk=pk).exists()
+
 
 class FriendRequest(models.Model):
     from_user = models.ForeignKey(User, related_name='friend_requests_sent',

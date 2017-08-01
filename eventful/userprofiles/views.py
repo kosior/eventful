@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.db.models import Prefetch
+from django.db.models import Prefetch, F
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -135,3 +135,14 @@ class RejectFriendRequest(InvitationActionMixin, View):
 
 class RemoveFriend(InvitationActionMixin, View):
     manager_method = FriendRequest.objects.remove_friend
+
+
+class GetFriends(View):
+    http_method_names = [u'get']
+
+    def get(self, request, username):
+        friends = UserProfile.objects.filter(user__username=username).values(
+            pk=F('friends__user_id'),
+            username=F('friends__user__username')
+        )
+        return JsonResponse(list(friends), safe=False)
