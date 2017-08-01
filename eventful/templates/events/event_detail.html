@@ -1,56 +1,271 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
 {% block title %}
     {{ event.title|truncatechars:10 }}...
 {% endblock %}
 
+{% block script_head %}
+    <script>var csrf_token = '{{ csrf_token }}'</script>
+    <script src="{% static 'js/invitation.js' %}"></script>
+{% endblock %}
+
 {% block content %}
     <div class="row">
-        <div class="col-md-6 col-md-offset-3">
-            <div class="panel panel-default">
-                <div class="panel-heading text-center">
-                    {{ event.title }}
-                    <br>
-                    <small class="text-muted">{{ event.get_privacy_display }}</small>
+        {% if user.is_authenticated %}
+            <div class="col-md-2 text-center">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+
+                        {% if not invite %}
+                            <button data-url="{% url 'event:join' event.pk %}"
+                                    data-change="Joined"
+                                    class="actionRequestBtn btn btn-block btn-primary">
+                                Join event
+                                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                            </button>
+                        {% elif invite.status == 'A' %}
+                            <div class="text-success">
+                                <strong>Invitation accepted</strong>
+                                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                            </div>
+                            <hr>
+                            <button data-url="{% url 'event:pend' event.pk %}"
+                                    data-change="Changed"
+                                    class="actionRequestBtn btn btn-block btn-default">
+                                Change to pending
+                                <span class="glyphicon glyphicon-hourglass"
+                                      aria-hidden="true"></span>
+                            </button>
+                            <br>
+                            <button data-url="{% url 'event:reject' event.pk %}"
+                                    data-change="Rejected"
+                                    class="actionRequestBtn btn btn-block btn-danger">
+                                Reject invitation
+                                <span class="glyphicon glyphicon-remove"
+                                      aria-hidden="true"></span>
+                            </button>
+                        {% elif invite.status == 'P' %}
+                            <button data-url="{% url 'event:accept' event.pk %}"
+                                    data-change="Accepted"
+                                    class="actionRequestBtn btn btn-block btn-primary">
+                                Accept invitation
+                                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                            </button>
+                            <br>
+                            <button data-url="{% url 'event:reject' event.pk %}"
+                                    data-change="Rejected"
+                                    class="actionRequestBtn btn btn-block btn-danger">
+                                Reject invitation
+                                <span class="glyphicon glyphicon-remove"
+                                      aria-hidden="true"></span>
+                            </button>
+                        {% elif invite.status == 'R' %}
+                            <div class="text-danger">
+                                <strong>Invitation rejected</strong>
+                                <span class="glyphicon glyphicon-remove"
+                                      aria-hidden="true"></span>
+                            </div>
+                            <hr>
+                            <button data-url="{% url 'event:accept' event.pk %}"
+                                    data-change="Accepted"
+                                    class="actionRequestBtn btn btn-block btn-primary">
+                                Accept invitation
+                                <span class="glyphicon glyphicon-hourglass"
+                                      aria-hidden="true"></span>
+                            </button>
+                            <br>
+                            <button data-url="{% url 'event:pend' event.pk %}"
+                                    data-change="Changed"
+                                    class="actionRequestBtn btn btn-block btn-default">
+                                Change to pending
+                                <span class="glyphicon glyphicon-hourglass"
+                                      aria-hidden="true"></span>
+                            </button>
+                        {% elif invite.status == 'S' %}
+
+                            <div class="text-success">
+                                <strong>Joined</strong>
+                                <span class="glyphicon glyphicon-ok"
+                                      aria-hidden="true"></span>
+                            </div>
+                            <hr>
+                            <button data-url="{% url 'event:self_remove' event.pk %}"
+                                    data-change="Left"
+                                    class="actionRequestBtn btn btn-block btn-danger">
+                                Leave event
+                                <span class="glyphicon glyphicon-remove"
+                                      aria-hidden="true"></span>
+                            </button>
+                        {% endif %}
+
+
+                        {% if user == event.created_by %}
+                            <hr>
+                            <span id="invitePop"
+                                  data-toggle="popover"
+                                  data-trigger="manual"
+                                  data-placement="top">
+                        <button id="inviteBtn" type="button" class="btn btn-block btn-primary"
+                                data-toggle="modal"
+                                data-target="#modalInvite"
+                                data-url="{% url 'userprofiles:get_friends' user.username %}">
+                            Invite
+                            <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
+                        </button>
+                        </span>
+                            <br>
+                            <a href="{% url 'event:update' event.pk %}"
+                               class="btn btn-block btn-default">
+                                Update
+                                <span class="glyphicon glyphicon-edit"
+                                      aria-hidden="true"></span>
+                            </a>
+                            <br>
+                            <button type="button" class="btn btn-block btn-danger"
+                                    data-toggle="modal"
+                                    data-target="#modalDelete">
+                                Delete
+                                <span class="glyphicon glyphicon-trash"
+                                      aria-hidden="true"></span>
+                            </button>
+
+
+                            <div class="modal" id="modalDelete" tabindex="-1" role="dialog">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close"
+                                                    data-dismiss="modal">
+                                                &times;
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <h4>Are you sure you want to delete this
+                                                event?</h4>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <form method="POST"
+                                                  action="{% url 'event:delete' event.pk %}">
+                                                {% csrf_token %}
+                                                <button class="btn btn-danger" type="submit"
+                                                        name="submit">Delete
+                                                </button>
+                                                <a href="#" class="btn btn-default"
+                                                   data-dismiss="modal">Cancel</a>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal" id="modalInvite" tabindex="-1" role="dialog">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close"
+                                                    data-dismiss="modal">
+                                                &times;
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="form-group">
+                                                <label for="inviteSelect">Friends:</label>
+                                                <select class="form-control" id="inviteSelect"
+                                                        name="pk" required>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button data-url="{% url 'event:invite' event.pk %}"
+                                                    id="inviteModalBtn" class="btn btn-danger"
+                                                    type="submit"
+                                                    name="submit">Invite
+                                            </button>
+                                            <a href="#" class="btn btn-default"
+                                               data-dismiss="modal">Cancel</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="panel-body">
-                    <div class="text-center"><p>{{ event.start_date }}</p></div>
-                    <pre>{{ event.description }}</pre>
-                </div>
-                <div class="panel-footer text-center">
-                    <small class="text-muted">Organizer:</small>
-                    <a href="{% url 'userprofiles:profile' event.created_by.username %}">{{ event.created_by.username }}</a>
-                    <br>
-                    <small class="text-muted">Views: {{ event.views }}</small>
+            </div>
+
+            <div class="col-md-10">
+
+        {% else %}
+            <div class="col-md-10 col-md-offset-1">
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading text-center">
+                        {{ event.title }}
+                        <br>
+                        <small class="text-muted">{{ event.get_privacy_display }}</small>
+                    </div>
+                    <div class="panel-body">
+                        <div class="text-center"><p>{{ event.start_date }}</p></div>
+                        <pre>{{ event.description }}</pre>
+                    </div>
+                    <div class="panel-footer text-center">
+                        <small class="text-muted">Organizer:</small>
+                        <a href="{% url 'userprofiles:profile' event.created_by.username %}">{{ event.created_by.username }}</a>
+                        <br>
+                        <small class="text-muted">Views: {{ event.views }}</small>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+        </div>
+        </div>
 
-    {% if user == event.created_by %}
-    <div class="text-center">
-        <a href="{% url 'events:update' event.pk %}" class="btn btn-default">Update</a>
-        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modalDelete">Delete</button>
-    </div>
+        <hr>
 
-    <div class="modal" id="modalDelete" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <h4>Are you sure you want to delete this event?</h4>
-                </div>
-                <div class="modal-footer">
-                    <form method="POST" action="{% url 'events:delete' event.pk %}">
-                        {% csrf_token %}
-                        <button class="btn btn-danger" type="submit" name="submit">Delete</button>
-                        <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
-                    </form>
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-2">
+                <div class="text-center well">Self Invitations</div>
+                <div class="text-center">
+                    {% for user in invites_self %}
+                        <a href="{% url 'userprofiles:profile' user %}">{{ user }}</a>
+                        <hr>
+                    {% endfor %}
                 </div>
             </div>
+            <div class="col-md-2">
+                <div class="text-center well">Accepted Invitations</div>
+                <div class="text-center">
+                    {% for user in invites_accepted %}
+                        <a href="{% url 'userprofiles:profile' user %}">{{ user }}</a>
+                        <hr>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="text-center well">Pending Invitations</div>
+                <div class="text-center">
+                    {% for user in invites_pending %}
+                        <a href="{% url 'userprofiles:profile' user %}">{{ user }}</a>
+                        <hr>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="text-center well">Rejected Invitations</div>
+                <div class="text-center">
+                    {% for user in invites_rejected %}
+                        <a href="{% url 'userprofiles:profile' user %}">{{ user }}</a>
+                        <hr>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-2"></div>
         </div>
-    </div>
-    {% endif %}
 {% endblock %}

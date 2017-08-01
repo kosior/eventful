@@ -1,24 +1,42 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
+from django.http import JsonResponse
 from django.urls import reverse, reverse_lazy
-from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
+from django.views.generic import (ListView, DetailView, CreateView, DeleteView, UpdateView, View,
+                                  TemplateView)
 
-from events.decorators import user_is_event_author
-from events.forms import EventForm
-from events.models import Event
+from .decorators import user_is_event_author
+from .forms import EventForm
+from .models import Event, EventInvite
 
 
 class EventDetail(DetailView):
     model = Event
-    queryset = Event.objects.select_related('created_by')
+    queryset = Event.objects.details(event_invites_cls=EventInvite)
+    invited_by_status = {}
+    user_invite_status = None
 
     def get_object(self, **kwargs):
         event = super().get_object(**kwargs)
-        event.views += 1
-        event.save()
+        perm, invite = event.get_permission_and_invite(self.request.user)
+        if not perm:
+            raise PermissionDenied
+        event.incr_views()
+        setattr(event, 'user_invite', invite)
         return event
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['invite'] = self.object.user_invite
+        invited_by_status = self.object.invited_by_status()
+
+        for key, value in invited_by_status.items():
+            context['invites_' + key] = value
+
+        return context
 
 
 class EventActionMixin:
@@ -35,7 +53,7 @@ class EventActionMixin:
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('events:detail', args=(self.object.pk, ))
+        return reverse('event:detail', args=(self.object.pk, ))
 
 
 @method_decorator(login_required, name='dispatch')
@@ -66,8 +84,7 @@ class EventListView(ListView):
     privacy = Event.PUBLIC
 
     def get_queryset(self):
-        events = Event.objects.select_related('created_by')
-        return events.filter(privacy=self.privacy, start_date__gt=timezone.now())
+        return Event.objects.future_by_privacy(self.privacy)
 
 
 class IndexView(EventListView):
@@ -89,3 +106,70 @@ class EventsPrivate(EventsPaginate):
 @method_decorator(login_required, name='dispatch')
 class EventsFriends(EventsPaginate):
     privacy = Event.FRIENDS
+
+
+class EventInviteAction(LoginRequiredMixin, View):
+    http_method_names = [u'post']
+    event_cls = None
+
+    def manager_method(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def get_event_object_or_pk(self, pk):
+        if self.event_cls:
+            try:
+                return self.event_cls.objects.get(pk=pk)
+            except self.event_cls.DoesNotExist:
+                return
+        else:
+            return pk
+
+    def post(self, request, pk):
+        result = False
+        obj_or_pk = self.get_event_object_or_pk(pk)
+        if obj_or_pk:
+            result = self.manager_method(obj_or_pk, request.user, request.POST.get('pk'))
+        return JsonResponse({'result': result})
+
+
+class JoinEvent(EventInviteAction):
+    event_cls = Event
+    manager_method = EventInvite.objects.join
+
+
+class AcceptEventInvite(EventInviteAction):
+    manager_method = EventInvite.objects.accept
+
+
+class RejectEventInvite(EventInviteAction):
+    manager_method = EventInvite.objects.reject
+
+
+class PendEventInvite(EventInviteAction):
+    manager_method = EventInvite.objects.pend
+
+
+class SelfRemoveEventInvite(EventInviteAction):
+    manager_method = EventInvite.objects.self_remove
+
+
+class RemoveEventInvite(EventInviteAction):
+    manager_method = EventInvite.objects.remove
+
+
+class Invite(EventInviteAction):
+    event_cls = Event
+    manager_method = EventInvite.objects.invite
+
+
+class ShowEventInvites(LoginRequiredMixin, TemplateView):
+    template_name = 'events/invites.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        invites_grouped = EventInvite.objects.get_all_grouped(self.request.user)
+
+        for key, value in invites_grouped.items():
+            context[key] = value
+
+        return context

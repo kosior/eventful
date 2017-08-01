@@ -4,6 +4,7 @@
 {% url 'events:public' as events_public %}
 {% url 'events:private' as events_private %}
 {% url 'events:friends' as events_friends %}
+{% url 'events:invites' as events_invites %}
 {% url 'events:create' as events_create %}
 {% url 'account_signup' as account_signup %}
 {% url 'account_login' as account_login %}
@@ -60,6 +61,7 @@
                         <li><a href="{{ events_public }}">Public</a></li>
                         <li><a href="{{ events_private }}">Private</a></li>
                         <li><a href="{{ events_friends }}">Friends</a></li>
+                        <li><a href="{{ events_invites }}">Invites</a></li>
                     </ul>
                 </li>
                 <li {% if request.path == events_create %} class="active" {% endif %}><a href="{{ events_create }}">Create event</a></li>
@@ -86,7 +88,7 @@
     </div>
 </nav>
 
-<div class="container-fluid" style="margin: 70px 50px 0 50px;">
+<div class="container-fluid" style="margin: 70px 5px 0 5px;">
     {% if messages %}
         <div class="row">
         {% for message in messages %}

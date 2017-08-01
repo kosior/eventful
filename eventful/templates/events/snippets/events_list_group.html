@@ -3,7 +3,7 @@
         <div class="underInfo">No events available.</div>
         {% for event in events %}
             <div class="event {% if datetime_now < event.start_date %}future{% else %}past hideEvent{% endif %}">
-            <a href="{% url 'events:detail' event.pk %}" class="list-group-item">
+            <a href="{% url 'event:detail' event.pk %}" class="list-group-item">
                 <div class="row">
                     <div class="col-md-3">
                         {{ event.start_date }}

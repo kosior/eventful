@@ -8,7 +8,8 @@ from userprofiles.views import SetTimezone
 urlpatterns = [
     url(r'^$', IndexView.as_view(), name='index'),
     url(r'^set/timezone/', SetTimezone.as_view(), name='set_timezone'),
-    url(r'^events/', include('events.urls')),
+    url(r'^event/(?P<pk>[\d]+)/', include('events.urls.event')),
+    url(r'^events/', include('events.urls.events')),
     url(r'^accounts/', include('allauth.urls')),
     url(r'^profile/(?P<username>[\w@.+-]{1,150})/', include('userprofiles.urls')),
     url(r'^admin/', admin.site.urls),
