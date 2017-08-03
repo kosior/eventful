@@ -5,6 +5,7 @@ from django.db.models import Prefetch, F
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, UpdateView, TemplateView, ListView, View
 
@@ -31,6 +32,7 @@ class ProfileDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         events = self.object.created_events.all()
+        context['datetime_now'] = timezone.now()
 
         if self.request.user == self.object:
             event_groups = {'PB': [], 'PR': [], 'FR': []}
