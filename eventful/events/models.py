@@ -24,6 +24,8 @@ class Event(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     privacy = models.CharField(max_length=2, choices=PRIVACY_CHOICES, default=PUBLIC)
     views = models.IntegerField(default=0)
+    latitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
+    longitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
 
     objects = EventManager()
 
