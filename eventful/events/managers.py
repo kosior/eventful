@@ -18,8 +18,8 @@ class EventManager(models.Manager):
 
 
 class EventInviteManager(models.Manager):
-    def join(self, event, user, *args):
-        perm, invite = event.get_permission_and_invite(user)
+    def join(self, event, user, *args, check_perm=True):
+        perm, invite = (True, False) if not check_perm else event.get_permission_and_invite(user)
         if perm and not invite:
             try:
                 self.create(event=event, from_user=user, to_user=user, status=self.model.SELF)

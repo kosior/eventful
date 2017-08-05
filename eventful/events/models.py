@@ -59,6 +59,11 @@ class Event(models.Model):
             return True, None
         return False, None
 
+    def self_invite_exist(self, user_pk):
+        return EventInvite.objects.filter(
+            event=self, to_user_id=user_pk, status=EventInvite.SELF
+        ).exists()
+
 
 class EventInvite(models.Model):
     ACCEPTED = 'A'

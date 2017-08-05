@@ -67,6 +67,11 @@ class EventUpdate(EventActionMixin, UpdateView):
     model = Event
     success_msg = 'Event updated.'
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['attend'] = self.object.self_invite_exist(self.request.user.pk)
+        return kwargs
+
 
 @method_decorator(user_is_event_author, name='dispatch')
 class EventDelete(DeleteView):
