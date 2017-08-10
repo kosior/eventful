@@ -15,7 +15,7 @@ from .models import Event, EventInvite
 
 class EventDetail(DetailView):
     model = Event
-    queryset = Event.objects.details(event_invites_cls=EventInvite)
+    queryset = Event.objects.details()
     invited_by_status = {}
     user_invite_status = None
 
@@ -89,7 +89,7 @@ class EventListView(ListView):
     privacy = Event.PUBLIC
 
     def get_queryset(self):
-        return Event.objects.future_by_privacy(self.privacy)
+        return Event.objects.future_by_privacy(self.privacy, self.request.user)
 
 
 class IndexView(EventListView):
@@ -104,13 +104,9 @@ class EventsPaginate(EventListView):
 
 
 @method_decorator(login_required, name='dispatch')
-class EventsPrivate(EventsPaginate):
-    privacy = Event.PRIVATE
-
-
-@method_decorator(login_required, name='dispatch')
 class EventsFriends(EventsPaginate):
-    privacy = Event.FRIENDS
+    def get_queryset(self):
+        return Event.objects.friends_events(self.request.user)
 
 
 class EventInviteAction(LoginRequiredMixin, View):

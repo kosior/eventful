@@ -8,7 +8,6 @@ app_name = 'events'
 urlpatterns = [
     url(r'^create/$', views.EventCreate.as_view(), name='create'),
     url(r'^public/$', views.EventsPaginate.as_view(), name='public'),
-    url(r'^private/$', views.EventsPrivate.as_view(), name='private'),
     url(r'^friends/$', views.EventsFriends.as_view(), name='friends'),
     url(r'^invites/$', views.ShowEventInvites.as_view(), name='invites'),
 ]

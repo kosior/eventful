@@ -2,7 +2,6 @@
 {% load staticfiles %}
 
 {% url 'events:public' as events_public %}
-{% url 'events:private' as events_private %}
 {% url 'events:friends' as events_friends %}
 {% url 'events:invites' as events_invites %}
 {% url 'events:create' as events_create %}
@@ -59,7 +58,6 @@
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">Events<span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ events_public }}">Public</a></li>
-                        <li><a href="{{ events_private }}">Private</a></li>
                         <li><a href="{{ events_friends }}">Friends</a></li>
                         <li><a href="{{ events_invites }}">Invites</a></li>
                     </ul>

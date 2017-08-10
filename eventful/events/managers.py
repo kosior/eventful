@@ -1,20 +1,42 @@
 from collections import defaultdict
 
+from django.apps import apps
 from django.db import models, IntegrityError
 from django.db.models import Prefetch, Q
 from django.utils import timezone
 
 
 class EventManager(models.Manager):
-    def future_by_privacy(self, privacy):
-        return self.filter(privacy=privacy,
-                           start_date__gt=timezone.now()).select_related('created_by')
+    @property
+    def EventInvite(self):
+        return apps.get_model('events', 'EventInvite')
 
-    def details(self, event_invites_cls):
-        prefetch_qs = event_invites_cls.objects.select_related('to_user')
+    def future_by_privacy(self, privacy, user):
+        return self.with_user_invites(user).filter(
+            privacy=privacy,
+            start_date__gt=timezone.now()
+        ).select_related('created_by')
+
+    def details(self):
+        prefetch_qs = self.EventInvite.objects.select_related('to_user')
         return self.model.objects.select_related('created_by').prefetch_related(
             Prefetch('invites', queryset=prefetch_qs)
         )
+
+    def friends_events(self, user):
+        friends_pks = user.profile.get_friends_pks()
+        return self.with_user_invites(user).filter(
+            created_by__in=friends_pks, start_date__gt=timezone.now()
+        ).exclude(
+            Q(privacy=self.model.PRIVATE) & ~Q(invites__to_user_id=user.pk)
+        ).select_related('created_by')
+
+    def with_user_invites(self, user):
+        return self.prefetch_related(Prefetch(
+                'invites',
+                queryset=self.EventInvite.objects.filter(to_user=user),
+                to_attr='user_invite'
+            ))
 
 
 class EventInviteManager(models.Manager):

@@ -6,6 +6,15 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <div class="text-nowrap dots">
+                        {% for invite in event.user_invite %}
+                            {% if invite.status == 'A' or invite.status == 'S' %}
+                                <span class="text-success glyphicon glyphicon-ok" aria-hidden="true"></span>
+                            {% elif invite.status == 'P' %}
+                                <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
+                            {% elif invite.status == 'R' %}
+                                <span class="text-danger glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            {% endif %}
+                        {% endfor %}
                         <a href="{% url 'event:detail' event.pk %}" title="{{ event.title }}">
                             <span class="glyphicon glyphicon-calendar"></span>
                             {{ event.title }}

@@ -11,13 +11,24 @@ class UserProfile(models.Model):
     friends = models.ManyToManyField('self')
 
     def __str__(self):
-        return self.user.pk
+        return str(self.user.pk)
 
     def are_friends(self, pk):
         return any(friend.pk == pk for friend in self.friends.all())
 
     def are_friends_by_filter(self, pk):
         return self.friends.filter(pk=pk).exists()
+
+    def get_friends(self):
+        return list(self.friends.all().select_related('user').values(
+            pk=models.F('friends__user_id'),
+            username=models.F('friends__user__username'),
+            first_name=models.F('friends__user__first_name'),
+            last_name=models.F('friends__user__last_name')
+        ))
+
+    def get_friends_pks(self):
+        return self.friends.all().values_list('user_id', flat=True)
 
 
 class FriendRequest(models.Model):
