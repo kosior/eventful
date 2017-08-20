@@ -42,7 +42,7 @@ class Event(models.Model):
         invited_by_status = defaultdict(list)
         invites = self.invites.select_related('event', 'to_user')
         for invite in invites:
-            invited_by_status[invite.get_status_display()].append(invite.to_user.username)
+            invited_by_status[invite.get_status_display()].append(invite.to_user)
         return invited_by_status
 
     def _get_user_invite(self, user_pk):

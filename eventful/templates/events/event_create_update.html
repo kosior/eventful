@@ -25,6 +25,7 @@
             height: 400px;
         }
     </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
@@ -52,6 +53,14 @@
 {% endblock %}
 
 {% block script-bottom %}
+    {% if friends %}
+        <script src="{% static 'js/invitation.js' %}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+        <script>
+            var friends = {{ friends|safe }};
+            setUpSelect2(friends);
+        </script>
+    {% endif %}
     <script src="{% static 'js/moment-with-locales.js' %}"></script>
     <script src="{% static 'js/moment-timezone-with-data.js' %}"></script>
     <script src="{% static 'js/bootstrap-datetimepicker.min.js' %}"></script>

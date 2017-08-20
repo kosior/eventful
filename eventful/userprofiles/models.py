@@ -20,12 +20,12 @@ class UserProfile(models.Model):
         return self.friends.filter(pk=pk).exists()
 
     def get_friends(self):
-        return list(self.friends.all().select_related('user').values(
-            pk=models.F('friends__user_id'),
-            username=models.F('friends__user__username'),
-            first_name=models.F('friends__user__first_name'),
-            last_name=models.F('friends__user__last_name')
-        ))
+        return self.friends.all().values(
+            pk=models.F('user_id'),
+            username=models.F('user__username'),
+            first_name=models.F('user__first_name'),
+            last_name=models.F('user__last_name')
+        )
 
     def get_friends_pks(self):
         return self.friends.all().values_list('user_id', flat=True)

@@ -12,10 +12,13 @@ class EventManager(models.Manager):
         return apps.get_model('events', 'EventInvite')
 
     def future_by_privacy(self, privacy, user):
-        return self.with_user_invites(user).filter(
-            privacy=privacy,
-            start_date__gt=timezone.now()
-        ).select_related('created_by')
+        objs = self
+        if user.is_authenticated:
+            objs = self.with_user_invites(user)
+        return objs.filter(
+                privacy=privacy,
+                start_date__gt=timezone.now()
+            ).select_related('created_by')
 
     def details(self):
         prefetch_qs = self.EventInvite.objects.select_related('to_user')
@@ -69,7 +72,7 @@ class EventInviteManager(models.Manager):
     def remove(self, event_pk, from_user, to_user_pk, *args):
         return self.filter(event_id=event_pk, from_user=from_user, to_user_id=to_user_pk).delete()
 
-    def invite(self, event, user, to_user_pk):
+    def _single_invite(self, event, user, to_user_pk):
         if not event.created_by == user:
             return False
         try:
@@ -81,6 +84,18 @@ class EventInviteManager(models.Manager):
             if created:
                 return True
             return False
+
+    def _bulk_invite(self, event, user, to_user_pks):
+        created = [self.model.objects._single_invite(event, user, pk) for pk in to_user_pks]
+
+        if all(created):
+            return True
+        return False
+
+    def invite(self, event, user, pk_or_pks):
+        if isinstance(pk_or_pks, list):
+            return self._bulk_invite(event, user, pk_or_pks)
+        return self._single_invite(event, user, pk_or_pks)
 
     def get_all_grouped(self, user):
         invites = self.filter(Q(from_user=user) | Q(to_user=user))

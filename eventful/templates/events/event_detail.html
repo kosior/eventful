@@ -12,11 +12,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.1.0/dist/leaflet.css"
           integrity="sha512-wcw6ts8Anuw10Mzh9Ytw4pylW8+NAD4ch3lqm9lzAsTxg0GFeJgoAtxuCLREZSC5lUXdVyo/7yfsqFjQ4S+aKw=="
           crossorigin=""/>
-{% endblock %}
-
-{% block script_head %}
-    <script>var csrf_token = '{{ csrf_token }}'</script>
-    <script src="{% static 'js/invitation.js' %}"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
@@ -179,8 +175,8 @@
                                         </div>
                                         <div class="modal-body">
                                             <div class="form-group">
-                                                <label for="inviteSelect">Friends:</label>
-                                                <select class="form-control" id="inviteSelect"
+                                                <label for="inviteSelect">Select your friends:</label>
+                                                <select multiple="multiple" style="width: 100%;" class="form-control" id="id_invite"
                                                         name="pk" required>
                                                 </select>
                                             </div>
@@ -240,13 +236,13 @@
 
         <hr>
 
-        <div class="row">
+        <div class="row invites">
             <div class="col-md-2"></div>
             <div class="col-md-2">
                 <div class="text-center well">Self Invitations</div>
                 <div class="text-center">
                     {% for user in invites_self %}
-                        <a href="{% url 'userprofiles:profile' user %}">{{ user }}</a>
+                        <a href="{% url 'userprofiles:profile' user.username  %}" data-pk="{{ user.pk }}">{{ user.username }}</a>
                         <hr>
                     {% endfor %}
                 </div>
@@ -255,7 +251,7 @@
                 <div class="text-center well">Accepted Invitations</div>
                 <div class="text-center">
                     {% for user in invites_accepted %}
-                        <a href="{% url 'userprofiles:profile' user %}">{{ user }}</a>
+                        <a href="{% url 'userprofiles:profile' user.username  %}" data-pk="{{ user.pk }}">{{ user.username }}</a>
                         <hr>
                     {% endfor %}
                 </div>
@@ -265,7 +261,7 @@
                 <div class="text-center well">Pending Invitations</div>
                 <div class="text-center">
                     {% for user in invites_pending %}
-                        <a href="{% url 'userprofiles:profile' user %}">{{ user }}</a>
+                        <a href="{% url 'userprofiles:profile' user.username  %}" data-pk="{{ user.pk }}">{{ user.username }}</a>
                         <hr>
                     {% endfor %}
                 </div>
@@ -275,7 +271,7 @@
                 <div class="text-center well">Rejected Invitations</div>
                 <div class="text-center">
                     {% for user in invites_rejected %}
-                        <a href="{% url 'userprofiles:profile' user %}">{{ user }}</a>
+                        <a href="{% url 'userprofiles:profile' user.username  %}" data-pk="{{ user.pk }}">{{ user.username  }}</a>
                         <hr>
                     {% endfor %}
                 </div>
@@ -285,6 +281,10 @@
 {% endblock %}
 
 {% block script-bottom %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+    <script>var csrf_token = '{{ csrf_token }}'</script>
+    <script src="{% static 'js/invitation.js' %}"></script>
+    <script>setUpSelect2();</script>
     <script src="https://unpkg.com/leaflet@1.1.0/dist/leaflet.js"
             integrity="sha512-mNqn2Wg7tSToJhvHcqfzLMU6J4mkOImSPTxVZAdo+lcPlk+GhZmYgACEe0x35K7YzW1zJ7XyJV/TT1MrdXvMcA=="
             crossorigin="">

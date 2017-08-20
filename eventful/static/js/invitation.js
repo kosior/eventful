@@ -22,7 +22,7 @@ $(function () {
     });
 
     $('#removeFriendBtn').click(function () {
-        customPost($(this), csrf_token, function (json, ref, pk) {
+        customPost($(this), csrf_token, function (json, ref) {
             $(ref).unbind('mouseenter mouseleave')
         });
     }).hover(function () {
@@ -37,12 +37,19 @@ $(function () {
 $(function () {
     $('#inviteBtn').click(function () {
         var url = $(this).attr('data-url');
+        var invitedPks = [];
+        $('.invites a').each(function () {
+            invitedPks.push($(this).attr('data-pk'));
+        });
+
         $.get(url, function (friends) {
-            var invSelect = $('#inviteSelect');
+            var invSelect = $('#id_invite');
             invSelect.empty();
-            invSelect.html('<option value="" disabled selected>Pick your friend</option>');
             friends.forEach(function (friend) {
-                invSelect.append($('<option></option>').attr('value', friend.pk).text(friend.username));
+                if($.inArray(friend.pk.toString(), invitedPks) === -1) {
+                    invSelect.append($('<option></option>').attr('value', friend.pk).attr(
+                    'data-fullname', friend.first_name + ' ' + friend.last_name).text(friend.username));
+                }
             });
 
         });
@@ -50,9 +57,9 @@ $(function () {
 
     $('#inviteModalBtn').click(function () {
         var url = $(this).attr('data-url');
-        var pk = $('#inviteSelect').find(":selected").attr('value');
-        var data = {'pk': pk, 'csrfmiddlewaretoken': csrf_token};
-        if (pk) {
+        var pks = $('#id_invite').val();
+        var data = {'pks[]': pks, 'csrfmiddlewaretoken': csrf_token};
+        if (pks) {
             $.post(url, data, function (json) {
                 var invitePop = $('#invitePop');
                 if (json.result) {
@@ -73,3 +80,29 @@ $(function () {
         }
     });
 });
+
+function rowSelectDisplay(state) {
+        var name = $(state.element).attr('data-fullname');
+        var opt = '<span>' + state.text + '<small> ' + name + '</small>' + '</span>';
+        return $(opt);
+    }
+
+function setUpFriendsOpts(friends) {
+    var invSelect = $('#id_invite');
+    invSelect.attr('multiple', 'multiple');
+    friends.forEach(function (friend) {
+        var fullName = friend.first_name + ' ' + friend.last_name;
+        invSelect.append($('<option></option>').attr('value', friend.pk).attr('data-fullname', fullName).text(friend.username));
+    });
+}
+
+function setUpSelect2(friends) {
+    if (friends) {
+        setUpFriendsOpts(friends);
+    }
+    $('#id_invite').select2({
+            placeholder: 'Select friends',
+            closeOnSelect: false,
+            templateResult: rowSelectDisplay
+        });
+}

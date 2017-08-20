@@ -7,6 +7,11 @@ from crispy_forms.bootstrap import AppendedText
 from .models import Event, EventInvite
 
 
+class InviteField(forms.MultipleChoiceField):
+    def valid_value(self, value):
+        return True
+
+
 class EventForm(forms.ModelForm):
     title = forms.CharField(label='Title', max_length=128)
     description = forms.CharField(label='Description', max_length=500, required=False,
@@ -20,11 +25,15 @@ class EventForm(forms.ModelForm):
                                    widget=forms.HiddenInput())
 
     attend = forms.BooleanField(label='Attend this event', required=False)
+    invite = InviteField(label='Invite friends', required=False)
 
     def __init__(self, *args, **kwargs):
         attend = kwargs.pop('attend', None)
+        update = kwargs.pop('update', None)
         super().__init__(*args, **kwargs)
         self.fields['attend'].initial = attend
+        if update:
+            del self.fields['invite']
 
     class Meta:
         model = Event
@@ -32,6 +41,12 @@ class EventForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=commit)
+
+        user_pks_to_invite = self.cleaned_data.get('invite')
+
+        if user_pks_to_invite:
+            EventInvite.objects.invite(event=instance, user=instance.created_by, pk_or_pks=user_pks_to_invite)
+
         if self.cleaned_data.get('attend'):
             EventInvite.objects.join(event=instance, user=instance.created_by, check_perm=False)
         elif self.instance.pk:  # user is updating an event
@@ -46,5 +61,6 @@ class EventForm(forms.ModelForm):
         Field('description', rows='5', style="resize: none"),
         AppendedText('start_date', '<span class="glyphicon glyphicon-calendar"></span>'),
         Field('privacy'),
-        Field('attend')
+        Field('invite', size='1'),
+        Field('attend'),
     )

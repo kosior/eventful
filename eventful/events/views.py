@@ -61,6 +61,11 @@ class EventCreate(EventActionMixin, CreateView):
     model = Event
     success_msg = 'Event created.'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['friends'] = list(self.request.user.profile.get_friends())
+        return context
+
 
 @method_decorator(user_is_event_author, name='dispatch')
 class EventUpdate(EventActionMixin, UpdateView):
@@ -70,6 +75,7 @@ class EventUpdate(EventActionMixin, UpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['attend'] = self.object.self_invite_exist(self.request.user.pk)
+        kwargs['update'] = True
         return kwargs
 
 
@@ -125,11 +131,14 @@ class EventInviteAction(LoginRequiredMixin, View):
         else:
             return pk
 
+    def get_post_value(self):
+        return self.request.POST.get('pk')
+
     def post(self, request, pk):
         result = False
         obj_or_pk = self.get_event_object_or_pk(pk)
         if obj_or_pk:
-            result = self.manager_method(obj_or_pk, request.user, request.POST.get('pk'))
+            result = self.manager_method(obj_or_pk, request.user, self.get_post_value())
         return JsonResponse({'result': result})
 
 
@@ -161,6 +170,9 @@ class RemoveEventInvite(EventInviteAction):
 class Invite(EventInviteAction):
     event_cls = Event
     manager_method = EventInvite.objects.invite
+
+    def get_post_value(self):
+        return self.request.POST.getlist('pks[]')
 
 
 class ShowEventInvites(LoginRequiredMixin, TemplateView):

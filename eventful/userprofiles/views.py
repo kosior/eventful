@@ -143,8 +143,6 @@ class GetFriends(View):
     http_method_names = [u'get']
 
     def get(self, request, username):
-        friends = UserProfile.objects.filter(user__username=username).values(
-            pk=F('friends__user_id'),
-            username=F('friends__user__username')
-        )
+        user_profile = UserProfile.objects.filter(user__username=username).first()
+        friends = user_profile.get_friends()
         return JsonResponse(list(friends), safe=False)
