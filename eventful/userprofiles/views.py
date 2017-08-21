@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.db.models import Prefetch, F
+from django.core.cache import cache
+from django.db.models import Prefetch
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -103,8 +104,7 @@ class ShowFriends(LoginRequiredMixin, ListView):
     template_name = 'userprofiles/friends.html'
 
     def get_queryset(self):
-        return self.request.user.profile.friends.select_related('user').only('user_id',
-                                                                           'user__username')
+        return self.request.user.profile.get_friends()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -112,6 +112,14 @@ class ShowFriends(LoginRequiredMixin, ListView):
         context['pending'] = grouped_requests.get('pending')
         context['sent'] = grouped_requests.get('sent')
         return context
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        key = f'invites-{request.user.pk}'
+        invites_num = cache.get(key)
+        if invites_num:
+            cache.decr(key, invites_num)
+        return response
 
 
 class InvitationActionMixin(LoginRequiredMixin):

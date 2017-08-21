@@ -63,7 +63,9 @@
                     </ul>
                 </li>
                 <li {% if request.path == events_create %} class="active" {% endif %}><a href="{{ events_create }}">Create event</a></li>
-                <li {% if request.path == friends_url %} class="active" {% endif %}><a href="{{ friends_url }}">Friends</a></li>
+                <li {% if request.path == friends_url %} class="active" {% endif %}><a href="{{ friends_url }}">
+                    Friends{% if friend_invites_num %}<span class="label label-danger notify" aria-hidden="true">{{ friend_invites_num }}</span>{% endif %}
+                </a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li style="margin-right: 5px;">

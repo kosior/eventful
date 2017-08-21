@@ -3,3 +3,4 @@ venv
 __pycache__
 eventful/eventful/settings/secrets.json
 migrations/
+eventful/tmp

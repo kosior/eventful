@@ -92,6 +92,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
                 'django.template.context_processors.tz',
+                'common.context_processors.notify_context_processor',
             ],
         },
     },

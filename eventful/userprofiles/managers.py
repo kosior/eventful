@@ -1,6 +1,15 @@
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
+
+
+def notify_by_cache(pk):
+    key = f'invites-{pk}'
+    if cache.get(key):
+        cache.incr(key)
+    else:
+        cache.set(key, 1)
 
 
 class FriendRequestManager(models.Manager):
@@ -17,6 +26,7 @@ class FriendRequestManager(models.Manager):
         _, created = self.get_or_create(from_user=from_user, to_user_id=to_user_pk)
 
         if created:
+            notify_by_cache(to_user_pk)
             return True
         return False
 
@@ -32,6 +42,10 @@ class FriendRequestManager(models.Manager):
     def accept(self, user_accepting, from_user_pk):
         if self._delete_request(user_accepting, from_user_pk):
             user_accepting.profile.friends.add(from_user_pk)
+            cache.delete_many([
+                f'friends-{user_accepting.pk}',
+                f'friends-{from_user_pk}'
+            ])
             return True
         return False
 

@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.db import models
 
 from .managers import FriendRequestManager
@@ -20,12 +21,19 @@ class UserProfile(models.Model):
         return self.friends.filter(pk=pk).exists()
 
     def get_friends(self):
-        return self.friends.all().values(
+        key = f'friends-{self.user_id}'
+        friends = cache.get(key)
+        if friends:
+            return friends
+
+        friends = list(self.friends.all().values(
             pk=models.F('user_id'),
             username=models.F('user__username'),
             first_name=models.F('user__first_name'),
             last_name=models.F('user__last_name')
-        )
+        ))
+        cache.set(key, friends)
+        return friends
 
     def get_friends_pks(self):
         return self.friends.all().values_list('user_id', flat=True)
