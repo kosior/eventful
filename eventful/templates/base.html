@@ -59,12 +59,11 @@
                     <ul class="dropdown-menu">
                         <li><a href="{{ events_public }}">Public</a></li>
                         <li><a href="{{ events_friends }}">Friends</a></li>
-                        <li><a href="{{ events_invites }}">Invites</a></li>
                     </ul>
                 </li>
                 <li {% if request.path == events_create %} class="active" {% endif %}><a href="{{ events_create }}">Create event</a></li>
                 <li {% if request.path == friends_url %} class="active" {% endif %}><a href="{{ friends_url }}">
-                    Friends{% if friend_invites_num %}<span class="label label-danger notify" aria-hidden="true">{{ friend_invites_num }}</span>{% endif %}
+                    Friends{% if friend_invites_count %}<span class="label label-danger notify" aria-hidden="true">{{ friend_invites_count }}</span>{% endif %}
                 </a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
@@ -77,6 +76,10 @@
                     </div>
                 </li>
                 {% if user.is_authenticated %}
+                    <li {% if request.path == events_invites %} class="active" {% endif %}><a href="{{ events_invites }}">
+                        <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
+                        {% if event_invites_count %}<span class="label label-danger notify" aria-hidden="true">{{ event_invites_count }}</span>{% endif %}
+                    </a></li>
                     <li {% if request.path == user_profile %} class="active" {% endif %}><a href="{{ user_profile }}">Profile</a></li>
                     <li {% if request.path == account_logout %} class="active" {% endif %}><a href="{{ account_logout }}"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
                 {% else %}

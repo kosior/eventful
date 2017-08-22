@@ -5,6 +5,8 @@ from django.db import models, IntegrityError
 from django.db.models import Prefetch, Q
 from django.utils import timezone
 
+from common.cache import notify_by_cache
+
 
 class EventManager(models.Manager):
     @property
@@ -82,6 +84,7 @@ class EventInviteManager(models.Manager):
             return False
         else:
             if created:
+                notify_by_cache('e_invites_count', to_user_pk)
                 return True
             return False
 

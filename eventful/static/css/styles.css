@@ -33,7 +33,7 @@ pre {
 }
 
 .notify {
-    position: relative;
-    top: -10px;
-    left: -4px;
+    position: absolute;
+    top: 5px;
+    right: 4px;
 }

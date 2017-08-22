@@ -3,13 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 
-
-def notify_by_cache(pk):
-    key = f'invites-{pk}'
-    if cache.get(key):
-        cache.incr(key)
-    else:
-        cache.set(key, 1)
+from common.cache import notify_by_cache
 
 
 class FriendRequestManager(models.Manager):
@@ -26,7 +20,7 @@ class FriendRequestManager(models.Manager):
         _, created = self.get_or_create(from_user=from_user, to_user_id=to_user_pk)
 
         if created:
-            notify_by_cache(to_user_pk)
+            notify_by_cache('f_invites_count', to_user_pk)
             return True
         return False
 

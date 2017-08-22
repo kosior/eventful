@@ -8,6 +8,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import (ListView, DetailView, CreateView, DeleteView, UpdateView, View,
                                   TemplateView)
 
+from common.cache import decr_notification
 from .decorators import user_is_event_author
 from .forms import EventForm
 from .models import Event, EventInvite
@@ -186,3 +187,8 @@ class ShowEventInvites(LoginRequiredMixin, TemplateView):
             context[key] = value
 
         return context
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        decr_notification('e_invites_count', request.user.pk)
+        return response

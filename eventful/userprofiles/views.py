@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.core.cache import cache
 from django.db.models import Prefetch
 from django.http import JsonResponse
 from django.shortcuts import redirect
@@ -10,6 +9,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, UpdateView, TemplateView, ListView, View
 
+from common.cache import decr_notification
 from .decorators import user_is_himself
 from .forms import UserProfileForm
 from .models import UserProfile, FriendRequest
@@ -115,10 +115,7 @@ class ShowFriends(LoginRequiredMixin, ListView):
 
     def dispatch(self, request, *args, **kwargs):
         response = super().dispatch(request, *args, **kwargs)
-        key = f'invites-{request.user.pk}'
-        invites_num = cache.get(key)
-        if invites_num:
-            cache.decr(key, invites_num)
+        decr_notification('f_invites_count', request.user.pk)
         return response
 
 
