@@ -9,11 +9,12 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, UpdateView, TemplateView, ListView, View
 
-from common.cache import decr_notification
 from .decorators import user_is_himself
 from .forms import UserProfileForm
 from .models import UserProfile, FriendRequest
 from .utils import get_timezones
+
+from common.cache import decr_notification
 
 
 class ProfileDetail(DetailView):

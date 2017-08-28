@@ -1,44 +1,19 @@
-import json
-import os
-
-from django.core.exceptions import ImproperlyConfigured
+import environ
 
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT_DIR = environ.Path(__file__) - 3
+APPS_DIR = ROOT_DIR.path('eventful')
 
-TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
+env = environ.Env()
 
-STATIC_DIR = os.path.join(BASE_DIR, 'static')
+READ_DOT_ENV_FILE = env.bool('DJANGO_READ_DOT_ENV_FILE', default=False)
 
-SETTINGS_DIR = os.path.dirname(__file__)
-
-SECRETS_JSON_FILE = 'secrets.json'
-
-try:
-    with open(os.path.join(SETTINGS_DIR, SECRETS_JSON_FILE)) as file:
-        secrets = json.load(file)
-except FileNotFoundError:
-    msg = f'File {SECRETS_JSON_FILE} not found. Create and populate it.'
-    raise ImproperlyConfigured(msg)
-
-
-def get_secret(setting, secrets=secrets):
-    try:
-        return secrets[setting]
-    except KeyError:
-        msg = f'Set the {setting} environment variable.'
-        raise ImproperlyConfigured(msg)
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_secret('SECRET_KEY')
+if READ_DOT_ENV_FILE:
+    env_file = str(ROOT_DIR.path('.env'))
+    env.read_env(env_file)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = env.bool('DJANGO_DEBUG', False)
 
 ALLOWED_HOSTS = []
 
@@ -77,12 +52,14 @@ MIDDLEWARE = [
     'middleware.timezone.TimezoneMiddleware'
 ]
 
-ROOT_URLCONF = 'eventful.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATE_DIR, ],
+        'DIRS': [
+            str(APPS_DIR.path('templates'))
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -98,22 +75,17 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'eventful.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
-    }
+    'default': env.db('DATABASE_URL', default='postgres:///th'),
 }
+
+DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 
 # Password validation
@@ -166,9 +138,13 @@ DATETIME_FORMAT = 'd.m.Y H:i O'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
+STATIC_DIR = str(APPS_DIR.path('static'))
+
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [STATIC_DIR, ]
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
 
 # django-crispy-forms
 
