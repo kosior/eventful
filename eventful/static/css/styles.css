@@ -37,3 +37,19 @@ pre {
     top: 5px;
     right: 4px;
 }
+
+.leaflet-container {
+    border-radius: 10px;
+    z-index: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.dnone {
+    display: none;
+}
+
+#mapCalHidden {
+    min-height: 500px;
+    display: none;
+}

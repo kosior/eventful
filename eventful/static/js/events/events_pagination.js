@@ -1,7 +1,7 @@
-var events;
+var eventsDiv;
 
 $(function () {
-    events = $(".events");
+    eventsDiv = $(".events");
 });
 
 function paginate (ref) {
@@ -9,6 +9,7 @@ function paginate (ref) {
     var pageNum = $(ref).attr("data-pagenum");
     pager.remove();
     $.get(url_events_ajax + "?page=" + pageNum, function (data) {
-        events.append(data);
+        eventsDiv.append(data);
+        updateMapCalEvents();
     });
 }
