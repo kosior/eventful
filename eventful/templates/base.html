@@ -10,6 +10,7 @@
 {% url 'account_logout' as account_logout %}
 {% url 'userprofiles:profile' user.username as user_profile %}
 {% url 'userprofiles:friends' user.username as friends_url %}
+{% url 'set_timezone' as set_timezone %}
 
 <html lang="en">
 <head>
@@ -21,15 +22,21 @@
         Eventful! - {% block title %}{% endblock %}
     </title>
 
-    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+{% block style-top %}
+{% endblock %}
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/darkly/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
 
     <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 
-    {% if not 'timezone' in request.COOKIES and request.path != account_signup and request.path != account_login %}
-        {% include 'userprofiles/snippets/timezone_picker_js.html' %}
-    {% endif %}
+    {% include 'userprofiles/snippets/timezone_alert.html' %}
+
+    {% block head %}
+    {% endblock %}
 
     {% block script_head %}
     {% endblock %}
@@ -49,7 +56,9 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand active" href="{% url 'admin:index' %}">Eventful!</a>
+            <a class="navbar-brand active" href="{% url 'admin:index' %}">
+                  <i class="fa fa-calendar-o fa-fw" aria-hidden="true"></i>Eventful!
+            </a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
@@ -62,26 +71,25 @@
                     </ul>
                 </li>
                 <li {% if request.path == events_create %} class="active" {% endif %}><a href="{{ events_create }}">Create event</a></li>
-                <li {% if request.path == friends_url %} class="active" {% endif %}><a href="{{ friends_url }}">
-                    Friends{% if friend_invites_count %}<span class="label label-danger notify" aria-hidden="true">{{ friend_invites_count }}</span>{% endif %}
-                </a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li style="margin-right: 5px;">
                     <div class="btn-nav" title="Timezone">
-                        <a href="{% url 'set_timezone' %}" class="btn btn-primary btn-sm navbar-btn">
-                            <span class="glyphicon glyphicon glyphicon-globe" aria-hidden="true">
-                            </span> &nbsp;{{ TIME_ZONE }}
+                        <a href="{% url 'set_timezone' %}" id="tzBtn" class="btn btn-primary btn-sm navbar-btn">
+                            <i class="fa fa-globe fa-lg" aria-hidden="true"></i> &nbsp;{{ TIME_ZONE }}
                         </a>
                     </div>
                 </li>
                 {% if user.is_authenticated %}
+                    <li {% if request.path == friends_url %} class="active" {% endif %}><a href="{{ friends_url }}">
+                    <span class="fa fa-users fa-lg"></span>{% if friend_invites_count %}<span class="label label-danger notify" aria-hidden="true">{{ friend_invites_count }}</span>{% endif %}
+                    </a></li>
                     <li {% if request.path == events_invites %} class="active" {% endif %}><a href="{{ events_invites }}">
-                        <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
+                        <span class="fa fa-envelope-o fa-lg" aria-hidden="true"></span>
                         {% if event_invites_count %}<span class="label label-danger notify" aria-hidden="true">{{ event_invites_count }}</span>{% endif %}
                     </a></li>
                     <li {% if request.path == user_profile %} class="active" {% endif %}><a href="{{ user_profile }}">Profile</a></li>
-                    <li {% if request.path == account_logout %} class="active" {% endif %}><a href="{{ account_logout }}"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
+                    <li {% if request.path == account_logout %} class="active" {% endif %}><a href="{{ account_logout }}"><i class="fa fa-power-off fa-lg" aria-hidden="true"></i></a></li>
                 {% else %}
                     <li {% if request.path == account_signup %} class="active" {% endif %}><a href="{{ account_signup }}">Register</a></li>
                     <li {% if request.path == account_login %} class="active" {% endif %}><a href="{{ account_login }}">Login</a></li>
@@ -105,12 +113,9 @@
         </div>
     {% endif %}
 
-    {% if not 'timezone' in request.COOKIES and request.path != account_signup and request.path != account_login %}
-        {% include 'userprofiles/snippets/timezone_picker_row.html' with base_template=True redirect_to=request.path %}
-    {% else %}
-        {% block content %}
-        {% endblock %}
-    {% endif %}
+    {% block content %}
+    {% endblock %}
+
 </div>
 
 {% block script-bottom %}

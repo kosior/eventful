@@ -1,7 +1,7 @@
 .dots {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 pre {
     border: 0;
@@ -52,4 +52,31 @@ pre {
 #mapCalHidden {
     min-height: 500px;
     display: none;
+}
+
+.text-light {
+    color: #ffffff;
+}
+
+.tz-select {
+    color: inherit;
+    background-color: inherit;
+    font: inherit;
+}
+
+.tz-select:hover {
+    color: inherit;
+    background-color: inherit;
+    font: inherit;
+}
+
+.tz-select:focus {
+    color: inherit;
+    background-color: inherit;
+    font: inherit;
+}
+
+#tz {
+    -moz-appearance: none;
+    -webkit-appearance: none;
 }

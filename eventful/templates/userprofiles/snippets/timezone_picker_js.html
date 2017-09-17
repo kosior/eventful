@@ -1,18 +1,27 @@
-{% load staticfiles %}
-
-<script src="{% static 'js/moment-with-locales.js' %}"></script>
-<script src="{% static 'js/moment-timezone-with-data.js' %}"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
 <script>
-    var resultTz;
-    var tz_abbr = moment.tz.guess();
-    var offset = moment().tz(tz_abbr).format('Z');
-    var url = '{% url 'set_timezone' %}' + '?timezone=' + tz_abbr;
-    $.get(url, function (result) {
-        resultTz = result;
-        $(function () {
-            $('#tz-guess').html(tz_abbr + ' (' + offset + ')');
-            $('#tz-picker').html(resultTz);
+    function setUpTzSelect() {
+        $('#tz').selectpicker({
+            template: {
+                caret: '<span class="fa fa-globe"></span>'
+            },
+            container: 'body',
+            dropupAuto: false,
+            style: 'tz-select',
+            liveSearch: true,
         });
-    });
+    }
+
+    {% if template == 'signup.html' %}
+        $(function () {
+            var url = '{% url 'set_timezone' %}';
+            $.get(url, function (result) {
+                $('#tz').html(result);
+                setUpTzSelect();
+            });
+        });
+    {% else %}
+        setUpTzSelect();
+        $('.dnone').show();
+    {% endif %}
 </script>

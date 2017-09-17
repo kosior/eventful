@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
 {% load i18n %}
 
 {% load crispy_forms_tags %}
 
 {% block title %}{% trans "Signup" %}{% endblock %}
 
-{% block script_head %}
-    {% include 'userprofiles/snippets/timezone_picker_js.html' %}
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
 {% endblock %}
 
 {% block content %}
@@ -18,14 +20,27 @@
                 <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
                 <form class="signup" method="POST" action="{% url 'account_signup' %}">
                     {% csrf_token %}
+                    <div id="tz-picker">
+                        <div class="form-group">
+                            <label for="tz">Timezone:</label>
+                            <select class="form-control" id="tz" name="timezone" required>
+                            </select>
+                        </div>
+                    </div>
                     {{ form|crispy }}
                     {% if redirect_field_value %}
                         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
                     {% endif %}
-                    <div id="tz-picker"></div>
-                    <button class="primaryAction btn btn-primary center-block btn-block" type="submit">{% trans "Sign Up" %} &raquo;</button>
+
+                    <button class="primaryAction btn btn-primary center-block btn-block"
+                            type="submit">{% trans "Sign Up" %} &raquo;
+                    </button>
                 </form>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block script-bottom %}
+    {% include 'userprofiles/snippets/timezone_picker_js.html' with template='signup.html' %}
 {% endblock %}

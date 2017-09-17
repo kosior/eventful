@@ -19,8 +19,8 @@
                                 <span class="text-danger glyphicon glyphicon-remove" aria-hidden="true"></span>
                             {% endif %}
                         {% endfor %}
-                        <a id="data-url-title" href="{% url 'event:detail' event.pk %}" title="{{ event.title }}">
-                            <span class="glyphicon glyphicon-calendar"></span>
+                        <a class="text-info" id="data-url-title" href="{% url 'event:detail' event.pk %}" title="{{ event.title }}">
+                            <span class="fa fa-calendar"></span>
                             {{ event.title }}
                         </a>
                         <br>
@@ -40,7 +40,16 @@
                     </div>
                 </div>
                 <div class="panel-footer" style="padding-top: 0; padding-bottom: 0">
-                    <small>Organizer: <a id="data-username" href="{% url 'userprofiles:profile' event.created_by.username %}">{{ event.created_by.username }}</a></small>
+                    <div class="row">
+                    <div class="col-md-12">
+                    <div class="pull-left">
+                        <small>
+                             <i class="fa fa-user-o fa-fw" aria-hidden="true"></i>
+                            <a id="data-username" href="{% url 'userprofiles:profile' event.created_by.username %}">{{ event.created_by.username }}</a>
+                        </small></div>
+                    <div class="pull-right"><small>Attendance: {{ event.num_att }}</small></div>
+                    </div>
+                    </div>
                 </div>
             </div>
         </div>

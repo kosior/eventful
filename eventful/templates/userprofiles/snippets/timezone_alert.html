@@ -1,0 +1,49 @@
+{% load staticfiles %}
+{% if not 'timezone' in request.COOKIES and 'account' not in request.path and 'timezone' not in request.path %}
+    <script src="{% static 'js/moment-with-locales.js' %}"></script>
+    <script src="{% static 'js/moment-timezone-with-data.js' %}"></script>
+    <script>
+        var title = `
+        <div class="row vcenter">
+            <div class="col-md-11">
+                <span class="text-info"><strong>Pick a timezone</strong></span>
+            </div>
+            <div class="col-md-1">
+                <button id="close" class="close" onclick="hideTzPop();">&times;</button>
+            </div>
+        </div>
+        `;
+        var content = `
+        <h4 class="text-center">Guessed timezone: <strong><br><span id="tz-guess"></span></strong></h4>
+        <div class="text-center">
+        To ensure that dates and times are displayed correctly, please set your timezone, or
+        <a href="{% url 'account_login' %}">log in</a> / <a href="{% url 'account_signup' %}">register</a>.
+        </div>
+        `;
+
+        var d = new Date();
+        d.setTime(d.getTime() + (365 * 24 * 60 * 60 * 1000));
+
+        function hideTzPop() {
+            $('#tzBtn').popover('hide');
+            document.cookie = "timezone=; expires=" + d.toUTCString();
+        }
+
+        $(function () {
+            var tz_abbr = moment.tz.guess();
+            var offset = moment().tz(tz_abbr).format('Z');
+
+            document.cookie = "tzguess=" + tz_abbr + "; expires=" + d.toUTCString();
+
+            $('#tzBtn').popover({
+                    placement: 'bottom',
+                    html: 'true',
+                    trigger: 'manual',
+                    title: title,
+                    content: content,
+                    container: 'body',
+                }).popover('show');
+            $('#tz-guess').html(tz_abbr + ' (' + offset + ')');
+        });
+    </script>
+{% endif %}

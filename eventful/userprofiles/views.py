@@ -75,7 +75,7 @@ class SetTimezone(TemplateView):
         return 'userprofiles/set_timezone.html'
 
     def get(self, request, *args, **kwargs):
-        tz = request.GET.get('timezone')
+        tz = request.COOKIES.get('tzguess')
         context = self.get_context_data(tz)
         return self.render_to_response(context)
 

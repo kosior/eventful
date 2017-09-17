@@ -140,6 +140,9 @@ function loadEventsMap() {
 function initAndSetCalendar() {
     if (!calendar) {
         $('#calendar').fullCalendar({
+            themeSystem: 'bootstrap3',
+            navLinks: true,
+            eventLimit: true,
             locale: 'en-gb',
             header: {
                 left: 'prev,next today',

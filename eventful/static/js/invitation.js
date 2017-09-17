@@ -48,10 +48,10 @@ $(function () {
             friends.forEach(function (friend) {
                 if($.inArray(friend.pk.toString(), invitedPks) === -1) {
                     invSelect.append($('<option></option>').attr('value', friend.pk).attr(
-                    'data-fullname', friend.first_name + ' ' + friend.last_name).text(friend.username));
+                    'data-subtext', friend.first_name + ' ' + friend.last_name).text(friend.username));
                 }
             });
-
+            invSelect.selectpicker('refresh');
         });
     });
 
@@ -81,28 +81,27 @@ $(function () {
     });
 });
 
-function rowSelectDisplay(state) {
-        var name = $(state.element).attr('data-fullname');
-        var opt = '<span>' + state.text + '<small> ' + name + '</small>' + '</span>';
-        return $(opt);
-    }
-
 function setUpFriendsOpts(friends) {
     var invSelect = $('#id_invite');
     invSelect.attr('multiple', 'multiple');
     friends.forEach(function (friend) {
         var fullName = friend.first_name + ' ' + friend.last_name;
-        invSelect.append($('<option></option>').attr('value', friend.pk).attr('data-fullname', fullName).text(friend.username));
+        invSelect.append($('<option></option>').attr('value', friend.pk).attr('data-subtext', fullName).text(friend.username));
     });
 }
 
-function setUpSelect2(friends) {
+function setUpFriendSelect(friends) {
     if (friends) {
         setUpFriendsOpts(friends);
     }
-    $('#id_invite').select2({
-            placeholder: 'Select friends',
-            closeOnSelect: false,
-            templateResult: rowSelectDisplay
+    $('#id_invite').selectpicker({
+        template: {
+                caret: '<span class="fa fa-users"></span>'
+            },
+        style: 'tz-select',
+        liveSearch: true,
+        actionsBox: true,
+        selectedTextFormat: 'count',
+        countSelectedText: '{0} friends selected',
         });
 }

@@ -15,16 +15,18 @@
         <div class="col-md-4">
             <div class="well text-center"><strong>Friends</strong></div>
             {% if friends %}
+                <ul class="list-group">
                 {% for friend in friends %}
-                    <div class="panel panel-default">
-                        <div class="panel-body">
+                      <li class="list-group-item">
                             <div class="row vcenter">
-                                <div class="col-md-6 nowrap dots">
+                                <div class="col-md-8 nowrap dots">
                                     <a href="{% url 'userprofiles:profile' friend.username %}">
                                         <strong>{{ friend.username }}</strong>
                                     </a>
+                                    <br>
+                                    <small>{{ friend.first_name }} {{ friend.last_name }}&nbsp;</small>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <button data-pk="{{ friend.pk }}"
                                             data-url="{% url 'userprofiles:remove_friend' friend.username %}"
                                             data-change="Removed"
@@ -33,9 +35,9 @@
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                    </li>
                 {% endfor %}
+                </ul>
             {% else %}
                 <br>
                 <div class="text-center">No friends</div>
