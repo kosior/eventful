@@ -102,6 +102,10 @@ class EventListView(ListView):
 class IndexView(EventListView):
     template_name = 'events/index.html'
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.order_by('-num_att')
+
 
 class EventsPaginate(EventListView):
     def get_template_names(self):

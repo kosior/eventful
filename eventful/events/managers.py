@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from django.apps import apps
 from django.db import models, IntegrityError
-from django.db.models import Prefetch, Q
+from django.db.models import Prefetch, Q, Count, Case, When, IntegerField
 from django.utils import timezone
 
 from common.cache import notify_by_cache
@@ -20,7 +20,11 @@ class EventManager(models.Manager):
         return objs.filter(
                 privacy=privacy,
                 start_date__gt=timezone.now()
-            ).select_related('created_by')
+            ).select_related('created_by').annotate(
+            num_att=Count(Case(When(
+                invites__status__in=(self.EventInvite.ACCEPTED, self.EventInvite.SELF), then=1
+            ), output_field=IntegerField()))
+        )
 
     def details(self):
         prefetch_qs = self.EventInvite.objects.select_related('to_user')
