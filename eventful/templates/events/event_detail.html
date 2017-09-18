@@ -2,6 +2,8 @@
 
 {% load l10n %}
 
+{% load markdown from markdown %}
+
 {% load staticfiles %}
 
 {% block title %}
@@ -204,11 +206,13 @@
             <div class="col-md-10 col-md-offset-1">
         {% endif %}
 
-        <div class="row">
-            <div class="col-md-12">
-                <div id="eventMap" style="height: 300px;"></div>
+        {% if event.latitude and event.longitude %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="eventMap" style="height: 300px;"></div>
+                </div>
             </div>
-        </div>
+        {% endif %}
     <br>
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
@@ -220,7 +224,7 @@
                     </div>
                     <div class="panel-body">
                         <div class="text-center"><p>{{ event.start_date }}</p></div>
-                        <pre>{{ event.description }}</pre>
+                        {{ event.description|markdown }}
                     </div>
                     <div class="panel-footer text-center">
                         <small class="text-muted">Organizer:</small>

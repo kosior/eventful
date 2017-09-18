@@ -89,7 +89,7 @@
     <script src="{% static 'js/maps.js' %}"></script>
     <script>
         {% localize off %}
-            {% if event %}
+            {% if event.latitude and event.longitude %}
                 var lat = {{ event.latitude }};
                 var lng = {{ event.longitude }};
                 var action = 'update';

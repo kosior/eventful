@@ -14,7 +14,7 @@ class InviteField(forms.MultipleChoiceField):
 
 class EventForm(forms.ModelForm):
     title = forms.CharField(label='Title', max_length=128)
-    description = forms.CharField(label='Description', max_length=500, required=False,
+    description = forms.CharField(label='Description (markdown supported)', max_length=500, required=False,
                                   widget=forms.Textarea())
     start_date = forms.DateTimeField(label='Start date and time',
                                      input_formats=['%d.%m.%Y %H:%M %z'])

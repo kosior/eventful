@@ -1,4 +1,5 @@
 {% load l10n %}
+{% load markdown from markdown %}
 <div class="row">
 
 {% if events %}
@@ -36,7 +37,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="text-nowrap dots">
-                        <small id="data-desc">{{ event.description }}&nbsp;</small>
+                        <small id="data-desc">{{ event.description|markdown|striptags }}&nbsp;</small>
                     </div>
                 </div>
                 <div class="panel-footer" style="padding-top: 0; padding-bottom: 0">
