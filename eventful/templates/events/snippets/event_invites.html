@@ -1,0 +1,20 @@
+<div class="row invites">
+    <div class="col-md-3">
+        <div class="text-center well">Self Invitations ({{ invites_self|length }})</div>
+        {% include template with users=invites_self %}
+    </div>
+    <div class="col-md-3">
+        <div class="text-center well">Accepted Invitations ({{ invites_accepted|length }})</div>
+        {% include template with users=invites_accepted %}
+    </div>
+
+    <div class="col-md-3">
+        <div class="text-center well">Pending Invitations ({{ invites_pending|length }})</div>
+        {% include template with users=invites_pending %}
+    </div>
+
+    <div class="col-md-3">
+        <div class="text-center well">Rejected Invitations ({{ invites_rejected|length }})</div>
+        {% include template with users=invites_rejected %}
+    </div>
+</div>

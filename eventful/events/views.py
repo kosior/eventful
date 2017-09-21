@@ -169,6 +169,7 @@ class SelfRemoveEventInvite(EventInviteAction):
 
 
 class RemoveEventInvite(EventInviteAction):
+    event_cls = Event
     manager_method = EventInvite.objects.remove
 
 

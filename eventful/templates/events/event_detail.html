@@ -239,49 +239,11 @@
         </div>
 
         <hr>
-
-        <div class="row invites">
-            <div class="col-md-2"></div>
-            <div class="col-md-2">
-                <div class="text-center well">Self Invitations</div>
-                <div class="text-center">
-                    {% for user in invites_self %}
-                        <a href="{% url 'userprofiles:profile' user.username  %}" data-pk="{{ user.pk }}">{{ user.username }}</a>
-                        <hr>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="text-center well">Accepted Invitations</div>
-                <div class="text-center">
-                    {% for user in invites_accepted %}
-                        <a href="{% url 'userprofiles:profile' user.username  %}" data-pk="{{ user.pk }}">{{ user.username }}</a>
-                        <hr>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <div class="col-md-2">
-                <div class="text-center well">Pending Invitations</div>
-                <div class="text-center">
-                    {% for user in invites_pending %}
-                        <a href="{% url 'userprofiles:profile' user.username  %}" data-pk="{{ user.pk }}">{{ user.username }}</a>
-                        <hr>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <div class="col-md-2">
-                <div class="text-center well">Rejected Invitations</div>
-                <div class="text-center">
-                    {% for user in invites_rejected %}
-                        <a href="{% url 'userprofiles:profile' user.username  %}" data-pk="{{ user.pk }}">{{ user.username  }}</a>
-                        <hr>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="col-md-2"></div>
-        </div>
+        {% if event.created_by == user %}
+            {% include 'events/snippets/event_invites.html' with template='events/snippets/event_invites_col_admin.html' %}
+        {% else %}
+            {% include 'events/snippets/event_invites.html' with template='events/snippets/event_invites_col.html' %}
+        {% endif %}
 {% endblock %}
 
 {% block script-bottom %}

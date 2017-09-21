@@ -32,6 +32,10 @@ $(function () {
         $(this).removeClass('btn-danger');
         $(this).html('Friends <span class="glyphicon glyphicon-ok"></span>');
     });
+
+    $('.actionRemoveInviteBtn').click(function () {
+        customPost($(this), csrf_token);
+    });
 });
 
 $(function () {

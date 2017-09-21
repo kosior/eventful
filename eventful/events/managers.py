@@ -75,8 +75,10 @@ class EventInviteManager(models.Manager):
     def self_remove(self, event_pk, user, *args):
         return self.filter(event_id=event_pk, from_user=user, status=self.model.SELF).delete()
 
-    def remove(self, event_pk, from_user, to_user_pk, *args):
-        return self.filter(event_id=event_pk, from_user=from_user, to_user_id=to_user_pk).delete()
+    def remove(self, event, from_user, to_user_pk, *args):
+        if event.created_by == from_user:
+            return self.filter(event=event, to_user_id=to_user_pk).delete()
+        return False
 
     def _single_invite(self, event, user, to_user_pk):
         if not event.created_by == user:
