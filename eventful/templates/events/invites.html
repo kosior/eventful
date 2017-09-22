@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-
 {% load staticfiles %}
 
 {% block title %}
@@ -14,134 +13,186 @@
 
 
 {% block content %}
+    <br>
     <div class="row">
-        <div class="col-md-2 col-md-offset-1">
-            <div class="well text-center"><strong>Self invites</strong></div>
-            {% for invite in self %}
-                <div class="panel panel-default">
-                    <div class="panel-body text-center">
-                        <div>Event: <a href="{% url 'event:detail' invite.event.pk %}">{{ invite.event.title }}</a></div>
-                        <hr>
-                        <button data-url="{% url 'event:self_remove' invite.event.pk %}"
-                                data-change="Left"
-                                class="actionRequestBtn btn btn-block btn-danger">
-                            Leave event
-                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                        </button>
-                    </div>
-                </div>
-            {% endfor %}
+        <div class="col-md-12">
+            <ul class="nav nav-pills nav-justified">
+                <li class="active"><a data-toggle="pill" href="#pendingInvites">Pending invites</a></li>
+                <li><a data-toggle="pill" href="#selfInvites">Self invites</a></li>
+                <li><a data-toggle="pill" href="#acceptedInvites">Accepted invites</a></li>
+                <li><a data-toggle="pill" href="#rejectedInvites">Rejected invites</a></li>
+                <li><a data-toggle="pill" href="#sentInvites">Sent invites</a></li>
+            </ul>
         </div>
-        <div class="col-md-2">
-            <div class="well text-center"><strong>Pending invites</strong></div>
-            {% for invite in pending %}
-                <div class="panel panel-default">
-                    <div class="panel-body text-center">
-                        <div>
-                            Event: <a
-                                href="{% url 'event:detail' invite.event.pk %}">{{ invite.event.title }}</a>
-                            From user: <a
-                                href="{% url 'userprofiles:profile' invite.from_user.username %}">{{ invite.from_user.username }}</a>
-                        </div>
-                        <hr>
-                        <button data-url="{% url 'event:accept' invite.event.pk %}"
-                                data-change="Accepted"
-                                class="actionRequestBtn btn btn-block btn-primary">
-                            Accept invitation
-                            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-                        </button>
 
-                        <button data-url="{% url 'event:reject' invite.event.pk %}"
-                                data-change="Rejected"
-                                class="actionRequestBtn btn btn-block btn-danger">
-                            Reject invitation
-                            <span class="glyphicon glyphicon-remove"
-                                  aria-hidden="true"></span>
-                        </button>
-                    </div>
-                </div>
-            {% endfor %}
+    </div>
+
+    <hr>
+    <br>
+
+    <div class="tab-content">
+        <div id="pendingInvites" class="row tab-pane fade in active">
+            <div class="col-md-6 col-md-offset-3">
+                <ul class="list-group">
+                    {% for invite in pending %}
+                        <li class="list-group-item">
+                            <div class="row vcenter">
+                                <div class="col-md-8 dots text-nowrap">
+                                    <strong>
+                                        <i title="Event" class="fa fa-calendar" aria-hidden="true"></i>&nbsp; <a class="text-info"
+                                            href="{% url 'event:detail' invite.event.pk %}">{{ invite.event.title }}</a>
+                                    </strong>
+                                    <br>
+                                    <i title="Created by" class="fa fa-user-o" aria-hidden="true"></i>&nbsp; <a class="text-muted"
+                                        href="{% url 'userprofiles:profile' invite.from_user.username %}">{{ invite.from_user.username }}</a>
+                                </div>
+                                <div title="Accept" class="col-md-2">
+                                    <button data-url="{% url 'event:accept' invite.event.pk %}"
+                                            data-change="Accepted"
+                                            class="actionRequestBtn btn btn-block btn-primary">
+                                        <i class="fa fa-check" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                                <div title="Reject" class="col-md-2">
+                                    <button data-url="{% url 'event:reject' invite.event.pk %}"
+                                            data-change="Rejected"
+                                            class="actionRequestBtn btn btn-block btn-default">
+                                        <i class="fa fa-close" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-        <div class="col-md-2">
-            <div class="well text-center"><strong>Accepted invites</strong></div>
-            {% for invite in accepted %}
-                <div class="panel panel-default">
-                    <div class="panel-body text-center">
-                        <div>
-                            Event: <a
-                                href="{% url 'event:detail' invite.event.pk %}">{{ invite.event.title }}</a>
-                            From user: <a
-                                href="{% url 'userprofiles:profile' invite.from_user.username %}">{{ invite.from_user.username }}</a>
-                        </div>
-                        <hr>
-                        <button data-url="{% url 'event:pend' invite.event.pk %}"
-                                    data-change="Changed"
-                                    class="actionRequestBtn btn btn-block btn-default">
-                                Change to pending
-                                <span class="glyphicon glyphicon-hourglass"
-                                      aria-hidden="true"></span>
-                            </button>
-                            <button data-url="{% url 'event:reject' invite.event.pk %}"
-                                    data-change="Rejected"
-                                    class="actionRequestBtn btn btn-block btn-danger">
-                                Reject invitation
-                                <span class="glyphicon glyphicon-remove"
-                                      aria-hidden="true"></span>
-                            </button>
-                    </div>
-                </div>
-            {% endfor %}
+
+        <div id="selfInvites" class="row tab-pane fade">
+            <div class="col-md-6 col-md-offset-3">
+                <ul class="list-group">
+                    {% for invite in self %}
+                        <li class="list-group-item">
+                            <div class="row vcenter">
+                                <div class="col-md-10 dots text-nowrap">
+                                    <strong>
+                                        <i title="Event" class="fa fa-calendar" aria-hidden="true"></i>&nbsp; <a class="text-info"
+                                            href="{% url 'event:detail' invite.event.pk %}">{{ invite.event.title }}</a>
+                                    </strong>
+                                </div>
+                                <div title="Leave event" class="col-md-2">
+                                    <button data-url="{% url 'event:self_remove' invite.event.pk %}"
+                                            data-change="Left"
+                                            class="actionRequestBtn btn btn-block btn-primary">
+                                        <i class="fa fa-close" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-        <div class="col-md-2">
-            <div class="well text-center"><strong>Rejected invites</strong></div>
-            {% for invite in rejected %}
-                <div class="panel panel-default">
-                    <div class="panel-body text-center">
-                        <div>
-                            Event: <a
-                                href="{% url 'event:detail' invite.event.pk %}">{{ invite.event.title }}</a>
-                            From user: <a
-                                href="{% url 'userprofiles:profile' invite.from_user.username %}">{{ invite.from_user.username }}</a>
-                        </div>
-                        <hr>
-                        <button data-url="{% url 'event:accept' invite.event.pk %}"
-                                    data-change="Accepted"
-                                    class="actionRequestBtn btn btn-block btn-primary">
-                                Accept invitation
-                                <span class="glyphicon glyphicon-hourglass"
-                                      aria-hidden="true"></span>
-                            </button>
-                            <button data-url="{% url 'event:pend' invite.event.pk %}"
-                                    data-change="Changed"
-                                    class="actionRequestBtn btn btn-block btn-default">
-                                Change to pending
-                                <span class="glyphicon glyphicon-hourglass"
-                                      aria-hidden="true"></span>
-                            </button>
-                    </div>
-                </div>
-            {% endfor %}
+
+        <div id="acceptedInvites" class="row tab-pane fade">
+            <div class="col-md-6 col-md-offset-3">
+                <ul class="list-group">
+                    {% for invite in accepted %}
+                        <li class="list-group-item">
+                            <div class="row vcenter">
+                                <div class="col-md-8 dots text-nowrap">
+                                    <strong>
+                                        <i title="Event" class="fa fa-calendar" aria-hidden="true"></i>&nbsp; <a class="text-info"
+                                            href="{% url 'event:detail' invite.event.pk %}">{{ invite.event.title }}</a>
+                                    </strong>
+                                    <br>
+                                    <i title="Invited by" class="fa fa-user-o" aria-hidden="true"></i>&nbsp; <a class="text-muted"
+                                        href="{% url 'userprofiles:profile' invite.from_user.username %}">{{ invite.from_user.username }}</a>
+                                </div>
+                                <div title="Change to pending" class="col-md-2">
+                                    <button data-url="{% url 'event:pend' invite.event.pk %}"
+                                            data-change="Changed"
+                                            class="actionRequestBtn btn btn-block btn-primary">
+                                        <i class="fa fa-hourglass-o" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                                <div title="Reject" class="col-md-2">
+                                    <button data-url="{% url 'event:reject' invite.event.pk %}"
+                                            data-change="Rejected"
+                                            class="actionRequestBtn btn btn-block btn-default">
+                                        <i class="fa fa-close" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-        <div class="col-md-2">
-            <div class="well text-center"><strong>Sent invites</strong></div>
-            {% for invite in sent %}
-                <div class="panel panel-default">
-                    <div class="panel-body text-center">
-                        <div>
-                            Event: <a href="{% url 'event:detail' invite.event.pk %}">{{ invite.event.title }}</a><br>
-                            To user: <a href="{% url 'userprofiles:profile' invite.to_user.username %}">{{ invite.to_user.username }}</a>
-                        </div>
-                        <hr>
-                        <button data-pk="{{ invite.to_user.pk }}"
-                                data-url="{% url 'event:remove' invite.event.pk %}"
-                                data-change="Removed"
-                                class="actionRequestBtn btn btn-block btn-danger">
-                            Remove
-                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                        </button>
-                    </div>
-                </div>
-            {% endfor %}
+
+        <div id="rejectedInvites" class="row tab-pane fade">
+            <div class="col-md-6 col-md-offset-3">
+                <ul class="list-group">
+                    {% for invite in rejected %}
+                        <li class="list-group-item">
+                            <div class="row vcenter">
+                                <div class="col-md-8 dots text-nowrap">
+                                    <strong>
+                                        <i title="Event" class="fa fa-calendar" aria-hidden="true"></i>&nbsp; <a class="text-info"
+                                            href="{% url 'event:detail' invite.event.pk %}">{{ invite.event.title }}</a>
+                                    </strong>
+                                    <br>
+                                    <i title="Invited by" class="fa fa-user-o" aria-hidden="true"></i>&nbsp; <a class="text-muted"
+                                        href="{% url 'userprofiles:profile' invite.from_user.username %}">{{ invite.from_user.username }}</a>
+                                </div>
+                                <div title="Accept" class="col-md-2">
+                                    <button data-url="{% url 'event:accept' invite.event.pk %}"
+                                            data-change="Accepted"
+                                            class="actionRequestBtn btn btn-block btn-primary">
+                                        <i class="fa fa-check" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                                <div title="Change to pending" class="col-md-2">
+                                    <button data-url="{% url 'event:pend' invite.event.pk %}"
+                                            data-change="Changed"
+                                            class="actionRequestBtn btn btn-block btn-default">
+                                        <i class="fa fa-hourglass-o" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div id="sentInvites" class="row tab-pane fade">
+            <div class="col-md-6 col-md-offset-3">
+                <ul class="list-group">
+                    {% for invite in sent %}
+                        <li class="list-group-item">
+                            <div class="row vcenter">
+                                <div class="col-md-10 dots text-nowrap">
+                                    <strong>
+                                        <i title="Event" class="fa fa-calendar" aria-hidden="true"></i>&nbsp; <a class="text-info"
+                                            href="{% url 'event:detail' invite.event.pk %}">{{ invite.event.title }}</a>
+                                    </strong>
+                                    <br>
+                                    <i title="User invited" class="fa fa-user-o" aria-hidden="true"></i>&nbsp; <a class="text-muted"
+                                        href="{% url 'userprofiles:profile' invite.to_user.username %}">{{ invite.to_user.username }}</a>
+                                </div>
+                                <div title="Remove" class="col-md-2">
+                                    <button data-pk="{{ invite.to_user.pk }}"
+                                            data-url="{% url 'event:remove' invite.event.pk %}"
+                                            data-change="Removed"
+                                            class="actionRequestBtn btn btn-block btn-primary">
+                                        <i class="fa fa-close" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </div>
 {% endblock %}
