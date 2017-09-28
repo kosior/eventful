@@ -3,6 +3,7 @@
 
 {% url 'events:public' as events_public %}
 {% url 'events:friends' as events_friends %}
+{% url 'events:invited_attending' as events_invited_attending %}
 {% url 'events:invites' as events_invites %}
 {% url 'events:create' as events_create %}
 {% url 'account_signup' as account_signup %}
@@ -86,6 +87,7 @@
                     <ul class="dropdown-menu">
                         <li><a href="{{ events_public }}">Public</a></li>
                         <li><a href="{{ events_friends }}">Friends</a></li>
+                        <li><a href="{{ events_invited_attending }}">Invited & attending</a></li>
                     </ul>
                 </li>
                 <li {% if request.path == events_create %} class="active" {% endif %}><a href="{{ events_create }}">Create event</a></li>

@@ -47,6 +47,10 @@ class FriendRequestManager(models.Manager):
         return self._delete_request(user_rejecting, from_user_pk)
 
     def remove_friend(self, request_user, user_pk):
+        cache.delete_many([
+            f'friends-{request_user.pk}',
+            f'friends-{user_pk}'
+        ])
         request_user.profile.friends.remove(user_pk)
         return True
 

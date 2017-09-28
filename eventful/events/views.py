@@ -197,3 +197,11 @@ class ShowEventInvites(LoginRequiredMixin, TemplateView):
         response = super().dispatch(request, *args, **kwargs)
         decr_notification('e_invites_count', request.user.pk)
         return response
+
+
+class ShowEventsInvitedAndAttending(LoginRequiredMixin, ListView):
+    context_object_name = 'events'
+    template_name = 'events/events.html'
+
+    def get_queryset(self):
+        return Event.objects.invited_and_attending(self.request.user)

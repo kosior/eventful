@@ -13,12 +13,15 @@ class EventManager(models.Manager):
     def EventInvite(self):
         return apps.get_model('events', 'EventInvite')
 
-    def future_by_privacy(self, privacy, user):
+    def future_by_privacy(self, privacy=None, user=None):
+        privacy_kw = {}
+        if privacy:
+            privacy_kw['privacy'] = privacy
         objs = self
         if user.is_authenticated:
             objs = self.with_user_invites(user)
         return objs.filter(
-                privacy=privacy,
+                **privacy_kw,
                 start_date__gt=timezone.now()
             ).select_related('created_by').annotate(
             num_att=Count(Case(When(
@@ -46,6 +49,9 @@ class EventManager(models.Manager):
                 queryset=self.EventInvite.objects.filter(to_user=user),
                 to_attr='user_invite'
             ))
+
+    def invited_and_attending(self, user):
+        return self.future_by_privacy(user=user).filter(invites__to_user_id=user.pk)
 
 
 class EventInviteManager(models.Manager):
