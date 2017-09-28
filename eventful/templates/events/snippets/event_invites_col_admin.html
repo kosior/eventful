@@ -3,7 +3,7 @@
         <li class="list-group-item">
             <div class="row vcenter">
                 <div class="col-md-8 text-nowrap dots">
-                    <a href="{% url 'userprofiles:profile' user_inv.username %}">
+                    <a href="{% url 'userprofiles:profile' user_inv.username %}" data-pk="{{ user_inv.pk }}">
                         <strong>{{ user_inv.username }}</strong>
                     </a>
                     <br>
