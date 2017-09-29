@@ -6,6 +6,7 @@
 {% url 'events:invited_attending' as events_invited_attending %}
 {% url 'events:invites' as events_invites %}
 {% url 'events:create' as events_create %}
+{% url 'events:search' as events_search %}
 {% url 'account_signup' as account_signup %}
 {% url 'account_login' as account_login %}
 {% url 'account_logout' as account_logout %}
@@ -91,6 +92,9 @@
                     </ul>
                 </li>
                 <li {% if request.path == events_create %} class="active" {% endif %}><a href="{{ events_create }}">Create event</a></li>
+                <li {% if request.path == events_search %} class="active" {% endif %}><a href="{{ events_search }}">
+                    <i class="fa fa-search fa-lg" aria-hidden="true"></i>
+                </a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li style="margin-right: 5px;">

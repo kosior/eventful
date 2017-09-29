@@ -205,3 +205,21 @@ class ShowEventsInvitedAndAttending(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Event.objects.invited_and_attending(self.request.user)
+
+
+class Search(TemplateView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.method == 'POST':
+            search_str = self.request.POST.get('searchInput')
+            context['events'] = Event.objects.search(Event.PUBLIC, self.request.user, search_str)
+        return context
+
+    def get_template_names(self):
+        if self.request.method == 'POST':
+            return 'events/snippets/events_4_in_row.html'
+        return 'events/search.html'
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(context)

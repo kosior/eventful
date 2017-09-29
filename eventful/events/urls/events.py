@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^friends/$', views.EventsFriends.as_view(), name='friends'),
     url(r'^invites/$', views.ShowEventInvites.as_view(), name='invites'),
     url(r'^invited/$', views.ShowEventsInvitedAndAttending.as_view(), name='invited_attending'),
+    url(r'^search/$', views.Search.as_view(), name='search'),
 ]

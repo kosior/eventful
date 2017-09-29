@@ -53,6 +53,10 @@ class EventManager(models.Manager):
     def invited_and_attending(self, user):
         return self.future_by_privacy(user=user).filter(invites__to_user_id=user.pk)
 
+    def search(self, privacy, user, search_str):
+        return self.future_by_privacy(privacy, user).filter(
+                (Q(title__icontains=search_str) | Q(description__icontains=search_str)))
+
 
 class EventInviteManager(models.Manager):
     def join(self, event, user, *args, check_perm=True):
