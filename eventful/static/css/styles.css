@@ -17,15 +17,6 @@ pre {
     display: none;
 }
 
-.underInfo {
-    position: absolute;
-    left: 50%;
-    top: 20px;
-    -ms-transform: translate(-50%, -50%);
-    -webkit-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-}
-
 .vcenter {
     display: flex;
     justify-content: center;
@@ -83,4 +74,28 @@ pre {
 
 .dropdown:hover .dropdown-menu {
     display: block;
+}
+
+.list-group-item.event:hover {
+    background-color: transparent;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.container-fluid {
+    flex: 1;
+}
+
+footer {
+    background-color: black;
+    opacity: 0.5;
+    padding: 10px;
 }

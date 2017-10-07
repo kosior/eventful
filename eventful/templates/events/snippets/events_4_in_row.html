@@ -47,8 +47,13 @@
                         <small>
                              <i class="fa fa-user-o fa-fw" aria-hidden="true"></i>
                             <a id="data-username" href="{% url 'userprofiles:profile' event.created_by.username %}">{{ event.created_by.username }}</a>
-                        </small></div>
-                    <div class="pull-right"><small>Attendance: {{ event.num_att }}</small></div>
+                        </small>
+                    </div>
+                    <div class="pull-right">
+                        <small title="Attendance">
+                            <i class="fa fa-group fa-fw" aria-hidden="true"></i> {{ event.num_att }}
+                        </small>
+                    </div>
                     </div>
                     </div>
                 </div>
