@@ -1,7 +1,7 @@
 function createMap() {
     var eventMap = L.map('eventMap');
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(eventMap);
     return eventMap;
 }
@@ -9,7 +9,7 @@ function createMap() {
 function eventDetailMap(lat, lng) {
     var eventMap = createMap();
     var zoom = 16;
-    var url = 'http://nominatim.openstreetmap.org/reverser?format=json&lat=' + lat + '&lon=' + lng;
+    var url = 'https://nominatim.openstreetmap.org/reverser?format=json&lat=' + lat + '&lon=' + lng;
 
     eventMap.setView([lat, lng], zoom);
 
