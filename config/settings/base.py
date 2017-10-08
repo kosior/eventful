@@ -1,3 +1,6 @@
+import os
+import socket
+
 import environ
 
 
@@ -12,13 +15,18 @@ if READ_DOT_ENV_FILE:
     env_file = str(ROOT_DIR.path('.env'))
     env.read_env(env_file)
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DJANGO_DEBUG', False)
-
-ALLOWED_HOSTS = []
 
 INTERNAL_IPS = []
 
+ALLOWED_HOSTS = []
+
+if os.getenv('DOCKER_CONTAINER'):
+    POSTGRES_HOST = 'db'
+    ip = socket.gethostbyname(socket.gethostname())
+    INTERNAL_IPS += [ip[:-1] + '1']
+else:
+    POSTGRES_HOST = '127.0.0.1'
 
 # Application definition
 
@@ -63,6 +71,7 @@ TEMPLATES = [
         ],
         'APP_DIRS': True,
         'OPTIONS': {
+            'debug': DEBUG,
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -83,11 +92,16 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
-    'default': env.db('DATABASE_URL', default='postgres:///th'),
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'eventful',
+        'USER': 'admin',
+        'PASSWORD': 'admin',
+        'HOST': POSTGRES_HOST,
+        'PORT': 5432,
+        'ATOMIC_REQUESTS': True,
+    }
 }
-
-DATABASES['default']['ATOMIC_REQUESTS'] = True
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -139,12 +153,19 @@ DATETIME_FORMAT = 'd.m.Y H:i O'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
+STATIC_ROOT = str(ROOT_DIR('staticfiles'))
+
 STATIC_DIR = str(APPS_DIR.path('static'))
 
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     STATIC_DIR,
+]
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
 # django-crispy-forms
