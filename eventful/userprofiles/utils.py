@@ -3,6 +3,10 @@ import os
 
 import pytz
 from django.conf import settings
+from django.contrib.auth.models import User
+
+from events.models import Event, EventInvite
+from .models import FriendRequest
 
 # abbreviation to timezones
 abbr_to_tz = os.path.join(settings.STATIC_DIR, 'tz', 'abbr_to_tz.json')
@@ -43,3 +47,21 @@ def check_timezone_abbr(abbr, offset):
         return offset_to_gmt(offset)
     else:
         return abbr
+
+
+# for demonstration purposes only
+def send_invites(pk):
+    try:
+        admin = User.objects.get(username='admin')
+    except User.DoesNotExist:
+        admin = None
+    else:
+        FriendRequest.objects.send_friend_request(from_user=admin, to_user_pk=pk)
+
+    try:
+        event = Event.objects.get(pk=1)
+    except Event.DoesNotExist:
+        pass
+    else:
+        if admin:
+            EventInvite.objects.invite(event=event, user=admin, pk_or_pks=pk)
