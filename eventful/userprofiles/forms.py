@@ -4,10 +4,10 @@ from .models import UserProfile
 
 
 class UserProfileForm(forms.ModelForm):
-    first_name = forms.CharField(label='First name', max_length=30)
-    last_name = forms.CharField(label='Last name', max_length=30)
-    email = forms.EmailField(label='Email')
-    website = forms.URLField(label='Website')
+    first_name = forms.CharField(label='First name', max_length=30, required=False)
+    last_name = forms.CharField(label='Last name', max_length=30, required=False)
+    email = forms.EmailField(label='Email', required=False)
+    website = forms.URLField(label='Website', required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
