@@ -25,10 +25,10 @@ class EventForm(forms.ModelForm):
     invite = InviteField(label='Invite friends', required=False)
 
     def __init__(self, *args, **kwargs):
-        attend = kwargs.pop('attend', None)
+        self.attend_init = kwargs.pop('attend_init', None)
         update = kwargs.pop('update', None)
         super().__init__(*args, **kwargs)
-        self.fields['attend'].initial = attend
+        self.fields['attend'].initial = self.attend_init
         if update:
             del self.fields['invite']
 
@@ -40,13 +40,14 @@ class EventForm(forms.ModelForm):
         instance = super().save(commit=commit)
 
         user_pks_to_invite = self.cleaned_data.get('invite')
+        attend = self.cleaned_data.get('attend')
 
         if user_pks_to_invite:
             EventInvite.objects.invite(event=instance, user=instance.created_by, pk_or_pks=user_pks_to_invite)
 
-        if self.cleaned_data.get('attend'):
+        if self.attend_init is False and attend:
             EventInvite.objects.join(event=instance, user=instance.created_by, check_perm=False)
-        elif self.instance.pk:  # user is updating an event
+        elif self.instance.pk and self.attend_init and attend is False:  # user is updating an event
             EventInvite.objects.self_remove(event_pk=instance.pk, user=instance.created_by)
         return instance
 
