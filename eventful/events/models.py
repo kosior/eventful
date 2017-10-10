@@ -54,15 +54,12 @@ class Event(models.Model):
         invite = self._get_user_invite(user.pk)
         if invite or self.privacy == self.PUBLIC or self.created_by_id == user.id:
             return True, invite
-        elif (self.privacy == self.FRIENDS and
-                user.profile.are_friends_by_filter(self.created_by_id)):
+        elif self.privacy == self.FRIENDS and user.profile.are_friends_by_filter(self.created_by_id):
             return True, None
         return False, None
 
-    def self_invite_exist(self, user_pk):
-        return EventInvite.objects.filter(
-            event=self, to_user_id=user_pk, status=EventInvite.SELF
-        ).exists()
+    def self_invite_exists(self, user_pk):
+        return EventInvite.objects.filter(event=self, to_user_id=user_pk, status=EventInvite.SELF).exists()
 
 
 class EventInvite(models.Model):
@@ -78,26 +75,10 @@ class EventInvite(models.Model):
         (SELF, 'self'),
     )
 
-    event = models.ForeignKey(
-        Event,
-        related_name='invites',
-        on_delete=models.CASCADE
-    )
-    from_user = models.ForeignKey(
-        User,
-        related_name='event_invites_sent',
-        on_delete=models.CASCADE
-    )
-    to_user = models.ForeignKey(
-        User,
-        related_name='event_invites_received',
-        on_delete=models.CASCADE
-    )
-    status = models.CharField(
-        choices=STATUS_CHOICES,
-        max_length=1,
-        default=PENDING
-    )
+    event = models.ForeignKey(Event, related_name='invites', on_delete=models.CASCADE)
+    from_user = models.ForeignKey(User, related_name='event_invites_sent', on_delete=models.CASCADE)
+    to_user = models.ForeignKey(User, related_name='event_invites_received', on_delete=models.CASCADE)
+    status = models.CharField(choices=STATUS_CHOICES, max_length=1, default=PENDING)
 
     objects = EventInviteManager()
 
