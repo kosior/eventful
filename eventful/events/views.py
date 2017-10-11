@@ -75,7 +75,7 @@ class EventUpdate(EventActionMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['attend_init'] = self.object.self_invite_exist(self.request.user.pk)
+        kwargs['attend_init'] = self.object.self_invite_exists(self.request.user.pk)
         kwargs['update'] = True
         return kwargs
 
