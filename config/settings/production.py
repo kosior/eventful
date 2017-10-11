@@ -26,7 +26,8 @@ CACHES = {
             'LOCATION': env('REDIS_LOCATION'),
             'OPTIONS': {
                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            }
+            },
+            'TIMEOUT': None,
         }
     }
 
