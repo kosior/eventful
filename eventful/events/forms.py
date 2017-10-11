@@ -44,7 +44,7 @@ class EventForm(forms.ModelForm):
         if user_pks_to_invite:
             EventInvite.objects.invite(event=instance, user=instance.created_by, pk_or_pks=user_pks_to_invite)
 
-        if self.attend_init is False and attend:
+        if not self.attend_init and attend:
             EventInvite.objects.join(event=instance, user=instance.created_by, check_perm=False)
         elif self.instance.pk and self.attend_init and attend is False:  # user is updating an event
             EventInvite.objects.self_remove(event_pk=instance.pk, user=instance.created_by)
