@@ -16,8 +16,7 @@ class EventForm(forms.ModelForm):
     title = forms.CharField(label='Title', max_length=128)
     description = forms.CharField(label='Description (markdown supported)', max_length=500, required=False,
                                   widget=forms.Textarea())
-    start_date = forms.DateTimeField(label='Start date and time', input_formats=['%d.%m.%Y %H:%M %z'],
-                                     validators=[validate_start_date])
+    start_date = forms.DateTimeField(label='Start date and time', validators=[validate_start_date])
     privacy = forms.ChoiceField(label='Privacy', choices=Event.PRIVACY_CHOICES)
     latitude = forms.DecimalField(max_digits=10, decimal_places=7, required=False, widget=forms.HiddenInput())
     longitude = forms.DecimalField(max_digits=10, decimal_places=7, required=False, widget=forms.HiddenInput())
