@@ -1,6 +1,10 @@
-from ..models import EventInvite, Event
+from django.utils.timezone import now, timedelta
+from django.test import TestCase
+from django.db.models.query import QuerySet
+
 from userprofiles.models import FriendRequest
 from .factories import UserFactory, EventFactory
+from ..models import EventInvite, Event
 
 
 class TestEvent:
@@ -16,6 +20,18 @@ class TestEvent:
         event.incr_views()
         event.refresh_from_db()
         assert event.views == 2
+
+    def test_get_invites_without_invites_list_attribute(self):
+        event = EventFactory(join=True)
+        invites = event.get_invites()
+        assert isinstance(invites, QuerySet)
+        assert invites[0].event == event
+
+    def test_get_invites_with_invites_list_attribute(self):
+        event = EventFactory(join=True)
+        invites_list = Event.objects.details().filter(pk=event.pk).first().invites_list
+        assert isinstance(invites_list, list)
+        assert invites_list[0].event == event
 
     def test_invited_by_status_no_invites(self):
         event = EventFactory()
@@ -120,6 +136,14 @@ class TestEvent:
         user = UserFactory()
         assert not event.self_invite_exists(user.pk)
 
+    def test_events_order(self):
+        event1 = EventFactory(start_date=now() + timedelta(hours=24))
+        event2 = EventFactory(start_date=now() + timedelta(hours=26))
+        event3 = EventFactory(start_date=now() + timedelta(hours=21))
+        event4 = EventFactory(start_date=now() + timedelta(hours=30))
+        all_events = list(Event.objects.all())
+        assert all_events == [event3, event1, event2, event4]
+
 
 class TestEventInvite:
     def test_str(self):
@@ -139,3 +163,21 @@ class TestEventInvite:
         invited_first = EventInvite.objects.invite(event, event.created_by, user.pk)
         invited_second = EventInvite.objects.invite(event, event.created_by, user.pk)
         assert invited_first and not invited_second
+
+
+class TestEventQueriesNum(TestCase):
+    def test_get_invites_without_invites_list_attribute(self):
+        event = EventFactory(join=True)
+        with self.assertNumQueries(3):
+            event_fetched = Event.objects.get(pk=event.pk)
+            username1 = event_fetched.created_by.username
+            invites = list(event.get_invites())
+            username2 = invites[0].to_user.username
+
+    def test_get_invites_with_invites_list_attribute(self):
+        event = EventFactory(join=True)
+        with self.assertNumQueries(2):
+            event_fetched = Event.objects.details().filter(pk=event.pk).first()
+            username1 = event_fetched.created_by.username
+            invites = event_fetched.get_invites()
+            username2 = invites[0].to_user.username
