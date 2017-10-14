@@ -14,41 +14,34 @@ class EventManager(models.Manager):
         return apps.get_model('events', 'EventInvite')
 
     def future_by_privacy(self, privacy=None, user=None):
+        objs = self
         privacy_kw = {}
         if privacy:
             privacy_kw['privacy'] = privacy
-        objs = self
-        if user.is_authenticated:
+        if user and user.is_authenticated:
             objs = self.with_user_invites(user)
-        return objs.filter(
-                **privacy_kw,
-                start_date__gt=timezone.now()
-            ).select_related('created_by').annotate(
-            num_att=Count(Case(When(
-                invites__status__in=(self.EventInvite.ACCEPTED, self.EventInvite.SELF), then=1
-            ), output_field=IntegerField()))
+        return objs.filter(**privacy_kw, start_date__gt=timezone.now()).select_related('created_by').annotate(
+            num_att=Count(Case(
+                When(invites__status__in=(self.EventInvite.ACCEPTED, self.EventInvite.SELF), then=1),
+                output_field=IntegerField()
+            ))
         )
 
     def details(self):
         prefetch_qs = self.EventInvite.objects.select_related('to_user')
         return self.model.objects.select_related('created_by').prefetch_related(
-            Prefetch('invites', queryset=prefetch_qs)
+            Prefetch('invites', queryset=prefetch_qs, to_attr='invites_list')
         )
 
     def friends_events(self, user):
         friends_pks = user.profile.get_friends_pks()
-        return self.with_user_invites(user).filter(
-            created_by__in=friends_pks, start_date__gt=timezone.now()
-        ).exclude(
+        return self.with_user_invites(user).filter(created_by__in=friends_pks, start_date__gt=timezone.now()).exclude(
             Q(privacy=self.model.PRIVATE) & ~Q(invites__to_user_id=user.pk)
         ).select_related('created_by')
 
     def with_user_invites(self, user):
-        return self.prefetch_related(Prefetch(
-                'invites',
-                queryset=self.EventInvite.objects.filter(to_user=user),
-                to_attr='user_invite'
-            ))
+        prefetch_qs = self.EventInvite.objects.filter(to_user=user)
+        return self.prefetch_related(Prefetch('invites', queryset=prefetch_qs, to_attr='user_invite'))
 
     def invited_and_attending(self, user):
         return self.future_by_privacy(user=user).filter(invites__to_user_id=user.pk)
@@ -94,8 +87,7 @@ class EventInviteManager(models.Manager):
         if not event.created_by == user:
             return False
         try:
-            obj, created = self.model.objects.get_or_create(event=event, from_user=user,
-                                                            to_user_id=to_user_pk)
+            obj, created = self.model.objects.get_or_create(event=event, from_user=user, to_user_id=to_user_pk)
         except IntegrityError:
             return False
         else:
