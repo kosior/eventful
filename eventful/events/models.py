@@ -38,15 +38,22 @@ class Event(models.Model):
     def incr_views(self):
         Event.objects.filter(pk=self.pk).update(views=models.F('views') + 1)
 
+    def get_invites(self):
+        if hasattr(self, 'invites_list'):
+            return self.invites_list
+        else:
+            return self.invites.select_related('to_user').all()
+
     def invited_by_status(self):
         invited_by_status = defaultdict(list)
-        invites = self.invites.select_related('event', 'to_user')
+        invites = self.get_invites()
         for invite in invites:
             invited_by_status[invite.get_status_display()].append(invite.to_user)
         return invited_by_status
 
     def _get_user_invite(self, user_pk):
-        for invite in self.invites.all():
+        invites = self.get_invites()
+        for invite in invites:
             if invite.to_user_id == user_pk:
                 return invite
 
