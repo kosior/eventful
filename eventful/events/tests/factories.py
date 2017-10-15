@@ -60,3 +60,14 @@ class EventFactory(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(UserFactory)
     title = 'Event title'
     start_date = factory.LazyAttribute(lambda o: EventFactory._get_date_time(o))
+
+
+class FriendshipFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = FriendRequest
+
+    @classmethod
+    def create(cls, **kwargs):
+        obj = super().create(**kwargs)
+        FriendRequest.objects.accept(obj.to_user, obj.from_user.pk)
+        return obj
