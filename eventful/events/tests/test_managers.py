@@ -5,9 +5,9 @@ from django.contrib.auth.models import AnonymousUser
 from django.db.transaction import TransactionManagementError
 from django.test import TestCase
 
+from events.managers import EventManager
+from events.models import EventInvite, Event
 from .factories import EventFactory, UserFactory, FriendshipFactory
-from ..managers import EventManager
-from ..models import EventInvite, Event
 
 
 class TestEventManager:

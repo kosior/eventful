@@ -1,10 +1,10 @@
-from django.utils.timezone import now, timedelta
-from django.test import TestCase
 from django.db.models.query import QuerySet
+from django.test import TestCase
+from django.utils.timezone import now, timedelta
 
+from events.models import EventInvite, Event
 from userprofiles.models import FriendRequest
 from .factories import UserFactory, EventFactory
-from ..models import EventInvite, Event
 
 
 class TestEvent:

@@ -2,7 +2,7 @@ from functools import wraps
 
 from django.core.exceptions import PermissionDenied
 
-from events.models import Event
+from .models import Event
 
 
 def user_is_event_author(fn):

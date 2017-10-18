@@ -2,8 +2,8 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from pytest import raises
 
+from events.decorators import user_is_event_author
 from .factories import EventFactory, UserFactory
-from ..decorators import user_is_event_author
 
 
 @user_is_event_author
