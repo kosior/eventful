@@ -1,6 +1,7 @@
 from django.db.models.query import QuerySet
 from django.test import TestCase
 from django.utils.timezone import now, timedelta
+from django.contrib.auth.models import AnonymousUser
 
 from events.models import EventInvite, Event
 from userprofiles.models import FriendRequest
@@ -121,6 +122,18 @@ class TestEvent:
             FriendRequest.objects.send_friend_request(user, event.created_by.pk)
             FriendRequest.objects.accept(event.created_by, user.pk)
             assert event.get_permission_and_invite(user) == (True, invite)
+
+        def test_event_public_with_anonymous_user(self):
+            event = EventFactory()
+            user = AnonymousUser()
+            assert event.get_permission_and_invite(user) == (True, None)
+
+        def test_event_private_or_friends_with_anonymous_user(self):
+            event1 = EventFactory(privacy=Event.FRIENDS)
+            event2 = EventFactory(privacy=Event.PRIVATE)
+            user = AnonymousUser()
+            assert event1.get_permission_and_invite(user) == (False, None)
+            assert event2.get_permission_and_invite(user) == (False, None)
 
     def test_self_invite_exists_with_self_invite(self):
         event = EventFactory()
