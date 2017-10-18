@@ -58,10 +58,11 @@ class Event(models.Model):
                 return invite
 
     def get_permission_and_invite(self, user):
-        invite = self._get_user_invite(user.pk)
+        is_user_auth = user.is_authenticated
+        invite = None if not is_user_auth else self._get_user_invite(user.pk)
         if invite or self.privacy == self.PUBLIC or self.created_by_id == user.id:
             return True, invite
-        elif self.privacy == self.FRIENDS and user.profile.are_friends_by_filter(self.created_by_id):
+        elif is_user_auth and self.privacy == self.FRIENDS and user.profile.are_friends_by_filter(self.created_by_id):
             return True, None
         return False, None
 
