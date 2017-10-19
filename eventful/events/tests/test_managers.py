@@ -420,7 +420,7 @@ class TestEventInviteManager:
         mocked_single_invite.assert_called_once_with(event, event.created_by, user.pk)
 
     @mock.patch('events.managers.EventInviteManager._bulk_invite')
-    def test_invite_patch_single_invite(self, mocked_bulk_invite):
+    def test_invite_patch_bulk_invite(self, mocked_bulk_invite):
         event = EventFactory()
         user1 = UserFactory()
         user2 = UserFactory()
