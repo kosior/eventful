@@ -11,6 +11,11 @@ from events.models import Event, EventInvite
 from .factories import EventFactory, UserFactory, FriendshipFactory
 
 
+def add_middleware_to_request(request, middleware_classes):
+    [m_class().process_request(request) for m_class in middleware_classes]
+    return request
+
+
 class TestEventDetail:
     url_name = 'event:detail'
 
@@ -133,11 +138,6 @@ class TestEventActionMixin:
 class TestEventCreate:
     url_view = 'events:create'
 
-    @staticmethod
-    def add_middleware_to_response(request, middleware_classes):
-        [m_class().process_request(request) for m_class in middleware_classes]
-        return request
-
     def test_access(self, rf):
         user1 = AnonymousUser()
         user2 = UserFactory()
@@ -166,15 +166,142 @@ class TestEventCreate:
             'title': 'Test title',
             'description': '',
             'privacy': Event.PUBLIC,
-            'start_date': (now() + timedelta(hours=24)).strftime('%d.%m.%Y %H:%M'),
+            'start_date': (now() + timedelta(hours=1, minutes=2)).strftime('%d.%m.%Y %H:%M'),
             'attend': False,
             'invite': []
         }
         user = UserFactory()
         request = rf.post(reverse(self.url_view), data)
-        self.add_middleware_to_response(request, (SessionMiddleware, MessageMiddleware))
+        add_middleware_to_request(request, (SessionMiddleware, MessageMiddleware))
+        request.user = user
+        response = views.EventCreate.as_view()(request)
+        assert response.status_code == 302
+        assert 'event/' in response.url
+        pk = int(response.url.split('/')[-2])
+        assert Event.objects.get(pk=pk).title == 'Test title'
+
+    def test_post_when_date_is_not_corect(self, rf):
+        data = {
+            'title': 'Test title',
+            'description': '',
+            'privacy': Event.PUBLIC,
+            'start_date': (now() + timedelta(minutes=59)).strftime('%d.%m.%Y %H:%M'),
+            'attend': False,
+            'invite': []
+        }
+        user = UserFactory()
+        request = rf.post(reverse(self.url_view), data)
+        add_middleware_to_request(request, (SessionMiddleware, MessageMiddleware))
+        request.user = user
+        response = views.EventCreate.as_view()(request)
+        assert not response.context_data['form'].is_valid()
+        assert 'Start date must be at least an hour from now.' in response.context_data['form'].errors['start_date']
+
+    def test_post_when_attend_checked(self, rf):
+        data = {
+            'title': 'Test title',
+            'description': '',
+            'privacy': Event.PUBLIC,
+            'start_date': (now() + timedelta(hours=24)).strftime('%d.%m.%Y %H:%M'),
+            'attend': True,
+            'invite': []
+        }
+        user = UserFactory()
+        request = rf.post(reverse(self.url_view), data)
+        add_middleware_to_request(request, (SessionMiddleware, MessageMiddleware))
         request.user = user
         response = views.EventCreate.as_view()(request)
         assert response.status_code == 302
         pk = int(response.url.split('/')[-2])
-        assert Event.objects.get(pk=pk).title == 'Test title'
+        event = Event.objects.get(pk=pk)
+        assert EventInvite.objects.get(event=event, to_user=event.created_by).status == EventInvite.SELF
+
+
+class TestEventUpdate:
+    url_view = 'event:update'
+
+    def test_access(self, rf):
+        event = EventFactory()
+        pk = event.pk
+        user = UserFactory()
+        request = rf.get(reverse(self.url_view, args=(pk,)))
+        request.user = user
+        with raises(PermissionDenied):
+            views.EventUpdate.as_view()(request, pk=pk)
+        request.user = event.created_by
+        response = views.EventUpdate.as_view()(request, pk=pk)
+        assert response.status_code == 200
+
+    def test_if_corrent_attend_init_form_kwarg_is_false(self, rf):
+        event = EventFactory()
+        pk = event.pk
+        request = rf.get(reverse(self.url_view, args=(pk,)))
+        request.user = event.created_by
+        response = views.EventUpdate.as_view()(request, pk=pk)
+        assert not response.context_data['form'].attend_init
+
+    def test_if_corrent_attend_init_form_kwarg_is_true(self, rf):
+        event = EventFactory(join=True)
+        pk = event.pk
+        request = rf.get(reverse(self.url_view, args=(pk,)))
+        request.user = event.created_by
+        response = views.EventUpdate.as_view()(request, pk=pk)
+        assert response.context_data['form'].attend_init
+
+    def test_if_corrent_update_form_kwarg_is_true(self, rf):
+        event = EventFactory(join=True)
+        pk = event.pk
+        request = rf.get(reverse(self.url_view, args=(pk,)))
+        request.user = event.created_by
+        response = views.EventUpdate.as_view()(request, pk=pk)
+        assert 'invite' not in response.context_data['form'].fields
+
+    def test_if_fields_updated(self, rf):
+        data = {
+            'title': 'New title',
+            'description': 'New description',
+            'privacy': Event.PRIVATE,
+            'start_date': (now() + timedelta(hours=10)).strftime('%d.%m.%Y %H:%M'),
+            'attend': False,
+            'invite': []
+        }
+        event = EventFactory(join=True)
+        pk = event.pk
+        title = event.title
+        desc = event.description
+        start_date = event.start_date
+        privacy = event.privacy
+        assert EventInvite.objects.get(event=event, to_user=event.created_by).status == EventInvite.SELF
+        request = rf.post(reverse(self.url_view, args=(pk,)), data)
+        add_middleware_to_request(request, (SessionMiddleware, MessageMiddleware))
+        request.user = event.created_by
+        response = views.EventUpdate.as_view()(request, pk=pk)
+        assert 'event/' + str(pk) in response.url
+        event_updated = Event.objects.get(pk=pk)
+        assert not title == event_updated.title and event_updated.title == 'New title'
+        assert not desc == event_updated.description and event_updated.description == 'New description'
+        assert not start_date == event_updated.start_date
+        assert not privacy == event_updated.privacy and event_updated.privacy == Event.PRIVATE
+
+        with raises(EventInvite.DoesNotExist):
+            EventInvite.objects.get(event=event, to_user=event.created_by)
+
+
+class TestEventDelete:
+    url_view = 'event:delete'
+
+    def test_access(self, rf):
+        event = EventFactory()
+        pk = event.pk
+        user = UserFactory()
+        request = rf.post(reverse(self.url_view, args=(pk,)))
+        request.user = user
+        add_middleware_to_request(request, (SessionMiddleware, MessageMiddleware))
+        with raises(PermissionDenied):
+            views.EventDelete.as_view()(request, pk=pk)
+        request.user = event.created_by
+        response = views.EventDelete.as_view()(request, pk=pk)
+        assert response.status_code == 302
+        with raises(Event.DoesNotExist):
+            Event.objects.get(pk=pk)
+        assert response.url == '/'
