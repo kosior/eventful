@@ -1,14 +1,5 @@
-<option value="" disabled selected>Please select your timezone</option>
-{% if timezones_suggested %}
-    <option disabled>--- Suggested timezones ---</option>
-    {% for timezone in timezones_suggested %}
-        <option value="{{ timezone }}" {% if timezone == request.COOKIES.timezone %}selected{% endif %}>
-            {{ timezone }}
-        </option>
-    {% endfor %}
-    <option disabled>--- Other timezones ---</option>
-{% endif %}
-{% for timezone in timezones_other %}
+<option value="" disabled selected>Please select your time zone</option>
+{% for timezone in timezones %}
     <option value="{{ timezone }}" {% if timezone == request.COOKIES.timezone %}selected{% endif %}>
         {{ timezone }}
     </option>

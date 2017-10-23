@@ -1,3 +1,4 @@
+import pytz
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
@@ -9,12 +10,10 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, UpdateView, TemplateView, ListView, View
 
+from common.cache import decr_notification
 from .decorators import user_is_himself
 from .forms import UserProfileForm
 from .models import UserProfile, FriendRequest
-from .utils import get_timezones
-
-from common.cache import decr_notification
 
 
 class ProfileDetail(DetailView):
@@ -74,29 +73,22 @@ class SetTimezone(TemplateView):
             return 'userprofiles/snippets/timezone_picker_select_form.html'
         return 'userprofiles/set_timezone.html'
 
-    def get(self, request, *args, **kwargs):
-        tz = request.COOKIES.get('tzguess')
-        context = self.get_context_data(tz)
-        return self.render_to_response(context)
-
     def post(self, request, *args, **kwargs):
         tz = request.POST.get('timezone')
         if request.user.is_authenticated:
             user_profile = request.user.profile
             user_profile.timezone = tz
             user_profile.save()
-            request.session['timezone'] = tz
+        request.session['timezone'] = tz
         redirect_to = request.POST.get('redirect_to')
         response = redirect(redirect_to)
         response.set_cookie('timezone', tz)
-        messages.success(request, 'Timezone set to: {}'.format(tz))
+        messages.success(request, 'Time zone set to: {}'.format(tz))
         return response
 
-    def get_context_data(self, tz, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        timezones_suggested, timezones_other = get_timezones(tz)
-        context.update({'timezones_suggested': timezones_suggested,
-                        'timezones_other': timezones_other})
+        context['timezones'] = pytz.common_timezones
         return context
 
 

@@ -6,7 +6,7 @@
         var title = `
         <div class="row vcenter">
             <div class="col-md-10">
-                <span class="text-info"><strong>Pick a timezone</strong></span>
+                <span class="text-info"><strong>Choose a time zone</strong></span>
             </div>
             <div class="col-md-1">
                 <button id="close" class="close" onclick="hideTzPop();">&times;</button>
@@ -14,27 +14,16 @@
         </div>
         `;
         var content = `
-        <h4 class="text-center">Guessed timezone: <strong><br><span id="tz-guess"></span></strong></h4>
         <div class="text-center">
-        To ensure that dates and times are displayed correctly, please set your timezone, or
-        <a href="{% url 'account_login' %}">log in</a> / <a href="{% url 'account_signup' %}">register</a>.
+        To ensure that dates and times are displayed correctly, you can change your time zone anytime.
         </div>
         `;
 
-        var d = new Date();
-        d.setTime(d.getTime() + (365 * 24 * 60 * 60 * 1000));
-
         function hideTzPop() {
             $('#tzBtn').popover('hide');
-            document.cookie = "timezone=; expires=" + d.toUTCString();
         }
 
         $(function () {
-            var tz_abbr = moment.tz.guess();
-            var offset = moment().tz(tz_abbr).format('Z');
-
-            document.cookie = "tzguess=" + tz_abbr + "; expires=" + d.toUTCString();
-
             $('#tzBtn').popover({
                     placement: 'bottom',
                     html: 'true',
@@ -43,7 +32,6 @@
                     content: content,
                     container: 'body',
                 }).popover('show');
-            $('#tz-guess').html(tz_abbr + ' (' + offset + ')');
         });
     </script>
 {% endif %}

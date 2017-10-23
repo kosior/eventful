@@ -3,7 +3,7 @@
 {% load staticfiles %}
 
 {% block title %}
-    Timezone
+    Time zone
 {% endblock %}
 
 {% block head %}
@@ -18,7 +18,7 @@
                     {% csrf_token %}
                     <div id="tz-picker">
                         <div class="form-group">
-                            <label for="tz">Timezone:</label>
+                            <label for="tz">Time zone:</label>
                             <select class="form-control" id="tz" name="timezone" required>
                                 {% include 'userprofiles/snippets/timezone_picker_select_form.html' %}
                             </select>
@@ -26,8 +26,8 @@
                     </div>
                     <input class="hidden" title="reload" name="redirect_to" value="{% url 'index' %}">
                     <button class="btn btn-primary center-block" type="submit" name="submit" style="width: 150px;">
-                        <strong>{% if request.user.is_authenticated %}Change timezone{% else %}Set
-                            timezone{% endif %}</strong>
+                        <strong>{% if request.user.is_authenticated %}Change time zone{% else %}Set
+                            time zone{% endif %}</strong>
                     </button>
                 </form>
             </div>
