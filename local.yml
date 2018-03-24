@@ -14,7 +14,9 @@ services:
     ports:
       - "6379:6379"
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
     command: python3 manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
