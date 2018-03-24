@@ -1,0 +1,47 @@
+version: "3"
+
+volumes:
+  postgres_data:
+  caddy:
+  static:
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file: 
+      - ./.env
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/production/django/Dockerfile
+    volumes:
+      - .:/app
+      - static:/app/staticfiles
+    env_file:
+      - ./.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    command: /prod_run.sh
+  caddy:
+    build:
+      context: .
+      dockerfile: ./compose/production/caddy/Dockerfile
+    depends_on:
+      - django
+    volumes:
+      - caddy:/root/.caddy
+      - static:/root/static
+    env_file: 
+      - ./.env
+    ports:
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"

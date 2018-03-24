@@ -1,0 +1,14 @@
+http://eventful.ksrk.tech {
+    redir / https://eventful.ksrk.tech{uri}
+}
+
+https://eventful.ksrk.tech {
+    root /root
+    proxy / django:8000 {
+        transparent
+        except /static
+    }
+    log
+}
+
+
